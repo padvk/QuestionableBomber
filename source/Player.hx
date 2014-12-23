@@ -15,7 +15,7 @@ class Player extends FlxSprite {
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
 		makeGraphic(16, 16, FlxColor.WHITE);
-		drag.x = drag.y = 100;
+		drag.x = drag.y = 1200;
 	}
 	
 	private function movement():Void {
