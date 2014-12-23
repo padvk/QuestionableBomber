@@ -17,7 +17,7 @@ class Player extends FlxSprite
 	{
 		super(X, Y);
 		makeGraphic(16, 16, FlxColor.WHITE);
-		drag.x = drag.y = 1200;
+		drag.x = drag.y = 100;
 		
 	}
 	
