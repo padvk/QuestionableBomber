@@ -7,8 +7,7 @@ import flixel.util.FlxSave;
  * references to objects and other things for quick-access. Feel
  * free to simply ignore it or change it in any way you like.
  */
-class Reg
-{
+class Reg {
 	/**
 	 * Generic levels Array that can be used for cross-state stuff.
 	 * Example usage: Storing the levels of a platformer.
