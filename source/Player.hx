@@ -1,6 +1,7 @@
 package ;
 
 import flixel.FlxG;
+import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
@@ -10,11 +11,16 @@ import flixel.util.FlxColor;
  * @author ...
  */
 class Player extends FlxSprite {
-	public var speed:Float = 200;
+	public var speed:Float = 100;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
-		makeGraphic(16, 16, FlxColor.WHITE);
+		loadGraphic(AssetPaths.player__png, true, 16, 16);
+		setFacingFlip(FlxObject.LEFT, false, false);
+		setFacingFlip(FlxObject.RIGHT, true, false);
+		animation.add("lr", [3, 4, 3, 5], 6, false);
+		animation.add("u", [6, 7, 6, 8], 6, false);
+		animation.add("d", [0, 1, 0, 2], 6, false);
 		drag.x = drag.y = 1200;
 	}
 	
@@ -40,15 +46,30 @@ class Player extends FlxSprite {
 			var mA:Float = 0;
 			if (_up) {
 				mA = -90;
+				facing = FlxObject.UP;
 			} else if (_down) {
 				mA = 90;
+				facing = FlxObject.DOWN;
 			} else if (_left) {
 				mA = 180;
+				facing = FlxObject.LEFT;
 			} else if (_right) {
 				mA = 0;
+				facing = FlxObject.RIGHT;
 			}
 			
 			FlxAngle.rotatePoint(speed, 0, 0, 0, mA, velocity);
+			
+			if ((velocity.x != 0 || velocity.y != 0) && touching == FlxObject.NONE) {
+				switch(facing) {
+					case FlxObject.LEFT, FlxObject.RIGHT:
+						animation.play("lr");
+					case FlxObject.UP:
+						animation.play("u");
+					case FlxObject.DOWN:
+						animation.play("d");
+				}
+			}
 		}
 	}
 	
