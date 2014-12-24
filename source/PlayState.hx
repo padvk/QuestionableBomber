@@ -1,6 +1,7 @@
 package;
 
 import flixel.addons.editors.ogmo.FlxOgmoLoader;
+import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -30,6 +31,8 @@ class PlayState extends FlxState {
 		_player = new Player();
 		_map.loadEntities(placeEntities, "entities");
 		add(_player);
+		
+		FlxG.camera.follow(_player, FlxCamera.STYLE_TOPDOWN, 1);
 		super.create();
 	}
 	
