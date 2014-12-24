@@ -22,6 +22,8 @@ class Player extends FlxSprite {
 		animation.add("u", [6, 7, 6, 8], 6, false);
 		animation.add("d", [0, 1, 0, 2], 6, false);
 		drag.x = drag.y = 1200;
+		setSize(8, 14);
+		offset.set(4, 2);
 	}
 	
 	private function movement():Void {

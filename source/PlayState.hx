@@ -1,9 +1,12 @@
 package;
 
+import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.FlxG;
+import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.text.FlxText;
+import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMath;
 
@@ -12,11 +15,20 @@ import flixel.util.FlxMath;
  */
 class PlayState extends FlxState {
 	private var _player:Player;
+	private var _map:FlxOgmoLoader;
+	private var _mWalls:FlxTilemap;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void {
-		_player = new Player(20, 20);
+		_map = new FlxOgmoLoader(AssetPaths.room_001__oel);
+		_mWalls = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
+		_mWalls.setTileProperties(1, FlxObject.NONE);
+		_mWalls.setTileProperties(2, FlxObject.ANY);
+		add(_mWalls);
+		
+		_player = new Player();
+		_map.loadEntities(placeEntities, "entities");
 		add(_player);
 		super.create();
 	}
@@ -34,5 +46,15 @@ class PlayState extends FlxState {
 	 */
 	override public function update():Void {
 		super.update();
-	}	
+		FlxG.collide(_player, _mWalls);
+	}
+	
+	private function  placeEntities(entityName:String, entityData:Xml):Void {
+		var x:Int = Std.parseInt(entityData.get("x"));
+		var y:Int = Std.parseInt(entityData.get("y"));
+		if (entityName == "player") {
+			_player.x = x;
+			_player.y = y;
+		}
+	}
 }
