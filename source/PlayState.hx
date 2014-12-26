@@ -33,7 +33,7 @@ class PlayState extends FlxState {
 		_map.loadEntities(placeEntities, "entities");
 		add(_player);
 		
-		FlxG.camera.follow(_player, FlxCamera.STYLE_TOPDOWN, 1);
+		FlxG.camera.follow(_player, FlxCamera.STYLE_LOCKON, 1);
 		super.create();
 	}
 	
