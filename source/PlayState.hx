@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.group.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
@@ -18,6 +19,9 @@ class PlayState extends FlxState {
 	private var _player:Player;
 	private var _map:FlxOgmoLoader;
 	private var _mWalls:FlxTilemap;
+	
+	private var _grpBombs:FlxTypedGroup<Bomb>;
+	var _e:Bool = false;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -31,7 +35,11 @@ class PlayState extends FlxState {
 		
 		_player = new Player();
 		_map.loadEntities(placeEntities, "entities");
+		_player.bombs = 1;
 		add(_player);
+		
+		_grpBombs = new FlxTypedGroup<Bomb>();
+		add(_grpBombs);
 		
 		FlxG.camera.follow(_player, FlxCamera.STYLE_LOCKON, 1);
 		super.create();
@@ -49,8 +57,15 @@ class PlayState extends FlxState {
 	 * Function that is called once every frame.
 	 */
 	override public function update():Void {
+		
 		super.update();
 		FlxG.collide(_player, _mWalls);
+		FlxG.collide(_player, _grpBombs);
+		
+		_e = FlxG.keys.anyPressed(["E"]);
+		if (_e) {
+			placeBomb();
+		}
 	}
 	
 	private function  placeEntities(entityName:String, entityData:Xml):Void {
@@ -60,5 +75,11 @@ class PlayState extends FlxState {
 			_player.x = x;
 			_player.y = y;
 		}
+	}
+	
+	public function placeBomb():Void {
+		var x:Float = _player.x;
+		var y:Float = _player.y;
+		_grpBombs.add(new Bomb(x, y));
 	}
 }

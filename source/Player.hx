@@ -12,6 +12,8 @@ import flixel.util.FlxColor;
  */
 class Player extends FlxSprite {
 	public var speed:Float = 100;
+	
+	public var bombs:Int = 0;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
@@ -61,7 +63,6 @@ class Player extends FlxSprite {
 			}
 			
 			FlxAngle.rotatePoint(speed, 0, 0, 0, mA, velocity);
-			
 			if ((velocity.x != 0 || velocity.y != 0) && touching == FlxObject.NONE) {
 				switch(facing) {
 					case FlxObject.LEFT, FlxObject.RIGHT:
