@@ -35,7 +35,7 @@ class PlayState extends FlxState {
 		
 		_player = new Player();
 		_map.loadEntities(placeEntities, "entities");
-		_player.bombs = 1;
+		_player.bombs = 10;
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -61,6 +61,7 @@ class PlayState extends FlxState {
 		super.update();
 		FlxG.collide(_player, _mWalls);
 		FlxG.collide(_player, _grpBombs);
+		FlxG.collide(_grpBombs, _mWalls);
 		
 		_e = FlxG.keys.anyPressed(["E"]);
 		if (_e) {
@@ -78,8 +79,12 @@ class PlayState extends FlxState {
 	}
 	
 	public function placeBomb():Void {
-		var x:Float = _player.x;
-		var y:Float = _player.y;
-		_grpBombs.add(new Bomb(x, y));
+		if (_player.bombs != 0 ) {
+			var x:Float = _player.x;
+			var y:Float = _player.y;
+			_grpBombs.add(new Bomb(x, y));
+			_player.bombs -= 1;
+		}
+		
 	}
 }
