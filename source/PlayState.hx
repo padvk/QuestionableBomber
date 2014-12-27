@@ -21,7 +21,8 @@ class PlayState extends FlxState {
 	private var _mWalls:FlxTilemap;
 	
 	private var _grpBombs:FlxTypedGroup<Bomb>;
-	var _e:Bool = false;
+	private var _e:Bool = false;
+	private var _alreadyPressedE:Bool = false;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -79,11 +80,19 @@ class PlayState extends FlxState {
 	}
 	
 	public function placeBomb():Void {
-		if (_player.bombs != 0 ) {
+		
+		if (_player.bombs > 0) {
 			var x:Float = _player.x;
 			var y:Float = _player.y;
 			_grpBombs.add(new Bomb(x, y));
 			_player.bombs -= 1;
+		}
+		_alreadyPressedE = true;
+		
+		while (_alreadyPressedE) {
+			if (FlxG.keys.anyJustReleased(["E"])) {
+				_alreadyPressedE = false;
+			}
 		}
 		
 	}
