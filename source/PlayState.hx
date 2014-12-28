@@ -11,6 +11,7 @@ import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMath;
+import flixel.util.FlxRect;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -19,14 +20,16 @@ class PlayState extends FlxState {
 	private var _player:Player;
 	private var _map:FlxOgmoLoader;
 	private var _mWalls:FlxTilemap;
-	
+	private var _tileSize:Float = 16.0;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
-	private var _e:Bool = false;
-	private var _alreadyPressedE:Bool = false;
+	
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void {
+		//Turn the mouse off
+		FlxG.mouse.visible = false;
+		
 		_map = new FlxOgmoLoader(AssetPaths.room_001__oel);
 		_mWalls = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		_mWalls.setTileProperties(1, FlxObject.NONE);
@@ -63,9 +66,9 @@ class PlayState extends FlxState {
 		FlxG.collide(_player, _mWalls);
 		FlxG.collide(_player, _grpBombs);
 		FlxG.collide(_grpBombs, _mWalls);
+		FlxG.collide(_grpBombs, _grpBombs);
 		
-		_e = FlxG.keys.anyPressed(["E"]);
-		if (_e) {
+		if (FlxG.keys.anyJustPressed(["E"])) {
 			placeBomb();
 		}
 	}
@@ -80,20 +83,11 @@ class PlayState extends FlxState {
 	}
 	
 	public function placeBomb():Void {
-		
 		if (_player.bombs > 0) {
-			var x:Float = _player.x;
-			var y:Float = _player.y;
-			_grpBombs.add(new Bomb(x, y));
+			var x:Float = Math.floor((_player.x + _player.offset.x) / _tileSize) * _tileSize;
+			var y:Float = Math.floor((_player.y + _player.offset.y) / _tileSize) * _tileSize;
+			_grpBombs.add(new Bomb(x, y, _player));
 			_player.bombs -= 1;
 		}
-		_alreadyPressedE = true;
-		
-		while (_alreadyPressedE) {
-			if (FlxG.keys.anyJustReleased(["E"])) {
-				_alreadyPressedE = false;
-			}
-		}
-		
 	}
 }

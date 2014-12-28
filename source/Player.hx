@@ -12,7 +12,6 @@ import flixel.util.FlxColor;
  */
 class Player extends FlxSprite {
 	public var speed:Float = 100;
-	
 	public var bombs:Int = 0;
 
 	public function new(X:Float=0, Y:Float=0) {
@@ -24,8 +23,8 @@ class Player extends FlxSprite {
 		animation.add("u", [6, 7, 6, 8], 6, false);
 		animation.add("d", [0, 1, 0, 2], 6, false);
 		drag.x = drag.y = 1200;
-		setSize(8, 14);
-		offset.set(5, 3);
+		setSize(6, 6);
+		offset.set(5, 7);
 	}
 	
 	private function movement():Void {
