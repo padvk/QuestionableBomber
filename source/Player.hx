@@ -79,5 +79,4 @@ class Player extends FlxSprite {
 		movement();
 		super.update();
 	}
-	
 }

@@ -8,7 +8,10 @@ import flash.Lib;
 import flixel.FlxGame;
 import flixel.FlxState;
 
-class Main extends Sprite {
+class ServerApiImpl extends haxe.remoting.AsyncProxy<ServerApi> {
+}
+
+class Main extends Sprite implements ClientApi {
 	var gameWidth:Int = 320; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 240; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = MenuState; // The FlxState the game starts with.
@@ -54,5 +57,13 @@ class Main extends Sprite {
 		}
 
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
+	}
+		
+	public function userJoin( name : String ) : Void {
+		
+	}
+	
+	public function userLeave( name : String ) : Void {
+		
 	}
 }
