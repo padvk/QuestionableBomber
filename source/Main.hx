@@ -12,6 +12,11 @@ class ServerApiImpl extends haxe.remoting.AsyncProxy<ServerApi> {
 }
 
 class Main extends Sprite implements ClientApi {
+	
+	var host : String = "localhost";
+	var port : Int = 1024;
+	var api : ServerApiImpl;
+	
 	var gameWidth:Int = 320; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 240; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = MenuState; // The FlxState the game starts with.
@@ -41,7 +46,47 @@ class Main extends Sprite implements ClientApi {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
+		setupNet();
+	}
+	
+	private function setupNet():Void {
+		//Setup the client socket to recieve and send info over
+		#if flash9
+			var s = new flash.net.XMLSocket();
+			s.addEventListener(flash.events.Event.CONNECT, onConnect);
+			s.addEventListener(flash.events.IOErrorEvent.IO_ERROR, onFailed);
+			s.connect(host, port);
+		#elseif sys
+			var s = new sys.net.Socket();
+			var connected:Bool = false;
+			try {
+				s.connect(new sys.net.Host(host), port);
+				connected = true;
+			}
+			catch (e : Dynamic) {
+				onFailed();
+			}
+		#end
+			
+		//Create remoting object used to communicate
+		var context = new haxe.remoting.Context();
+		context.addObject("client",this);
+		var scnx = haxe.remoting.SocketConnection.create(s, context);
+		api = new ServerApiImpl(scnx.api);
+		
+		#if sys
+		if (connected) {
+			onConnect();
+		}
+		#end
+	}
+	
+	function onConnect(event:flash.events.Event=null):Void{
 		setupGame();
+	}
+	
+	function onFailed(event:flash.events.Event=null):Void{
+		trace("Failed to connect");
 	}
 	
 	private function setupGame():Void {
