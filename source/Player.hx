@@ -3,6 +3,7 @@ package ;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.tweens.FlxTween;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 
@@ -11,7 +12,8 @@ import flixel.util.FlxColor;
  * @author ...
  */
 class Player extends FlxSprite {
-	public var speed:Float = 100;
+	private var tweenTime:Float = .4;
+	private var tweenFinished: Bool = true;
 	public var bombs:Int = 0;
 
 	public function new(X:Float=0, Y:Float=0) {
@@ -23,8 +25,6 @@ class Player extends FlxSprite {
 		animation.add("u", [6, 7, 6, 8], 6, false);
 		animation.add("d", [0, 1, 0, 2], 6, false);
 		drag.x = drag.y = 1200;
-		setSize(6, 6);
-		offset.set(5, 7);
 	}
 	
 	private function movement():Void {
@@ -32,47 +32,44 @@ class Player extends FlxSprite {
 		var _down:Bool = false;
 		var _left:Bool = false;
 		var _right:Bool = false;
-		
+		 
 		_up = FlxG.keys.anyPressed(["UP", "W"]);
 		_down = FlxG.keys.anyPressed(["DOWN", "S"]);
 		_left = FlxG.keys.anyPressed(["LEFT", "A"]);
 		_right = FlxG.keys.anyPressed(["RIGHT", "D"]);
 		
-		if (_up && _down) {
-			_up = _down = false;
-		}
-		if (_left && _right) {
-			_left = _right = false;
-		}
-		
-		if (_up || _down || _left || _right) {
+		//Setting direction of tween and facing
+		if ((_up || _down || _left || _right) && tweenFinished == true) {
+			tweenFinished = false;
 			var mA:Float = 0;
 			if (_up) {
-				mA = -90;
+				FlxTween.tween(this, { y:y - 16 }, tweenTime, { complete:endTween });
 				facing = FlxObject.UP;
 			} else if (_down) {
-				mA = 90;
+				FlxTween.tween(this, { y:y + 16 }, tweenTime, { complete:endTween });
 				facing = FlxObject.DOWN;
 			} else if (_left) {
-				mA = 180;
+				FlxTween.tween(this, { x:x - 16 }, tweenTime, { complete:endTween });
 				facing = FlxObject.LEFT;
 			} else if (_right) {
-				mA = 0;
+				FlxTween.tween(this, { x:x + 16 }, tweenTime, { complete:endTween });
 				facing = FlxObject.RIGHT;
 			}
 			
-			FlxAngle.rotatePoint(speed, 0, 0, 0, mA, velocity);
-			if ((velocity.x != 0 || velocity.y != 0) && touching == FlxObject.NONE) {
-				switch(facing) {
-					case FlxObject.LEFT, FlxObject.RIGHT:
-						animation.play("lr");
-					case FlxObject.UP:
-						animation.play("u");
-					case FlxObject.DOWN:
-						animation.play("d");
+			//Play animations
+			switch(facing) {
+				case FlxObject.LEFT, FlxObject.RIGHT:
+					animation.play("lr");
+				case FlxObject.UP:
+					animation.play("u");
+				case FlxObject.DOWN:
+					animation.play("d");
 				}
-			}
 		}
+	}
+	
+	private function endTween(T:FlxTween):Void  {
+		tweenFinished = true;
 	}
 	
 	override public function update():Void {

@@ -57,11 +57,9 @@ class PlayState extends FlxState {
 		super.destroy();
 	}
 
-	/**
-	 * Function that is called once every frame.
-	 */
+	 //Function that is called once every frame.
+
 	override public function update():Void {
-		
 		super.update();
 		FlxG.collide(_player, _mWalls);
 		FlxG.collide(_player, _grpBombs);
@@ -84,8 +82,8 @@ class PlayState extends FlxState {
 	
 	public function placeBomb():Void {
 		if (_player.bombs > 0) {
-			var x:Float = Math.floor((_player.x + _player.offset.x) / _tileSize) * _tileSize;
-			var y:Float = Math.floor((_player.y + _player.offset.y) / _tileSize) * _tileSize;
+			var x:Float = Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize;
+			var y:Float = Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize;
 			_grpBombs.add(new Bomb(x, y, _player));
 			_player.bombs -= 1;
 		}
