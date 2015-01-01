@@ -79,8 +79,8 @@ class PlayState extends FlxState {
 	
 	public function placeBomb():Void {
 		if (_player.bombs > 0) {
-			var x:Float = Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize;
-			var y:Float = Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize;
+			var x:Float = (Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize) + 1;
+			var y:Float = (Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize) + 1;
 			_grpBombs.add(new Bomb(x, y, _player));
 			_player.bombs -= 1;
 		}
