@@ -19,7 +19,7 @@ import flixel.util.FlxRect;
 class PlayState extends FlxState {
 	private var _player:Player;
 	private var _map:FlxOgmoLoader;
-	private var _mWalls:FlxTilemap;
+	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float = 16.0;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	
@@ -31,15 +31,12 @@ class PlayState extends FlxState {
 		FlxG.mouse.visible = false;
 		
 		_map = new FlxOgmoLoader(AssetPaths.room_001__oel);
-		_mWalls = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
-		_mWalls.setTileProperties(1, FlxObject.NONE);
-		_mWalls.setTileProperties(2, FlxObject.ANY);
-		_mWalls.setTileProperties(3, FlxObject.ANY);
-		add(_mWalls);
+		_mTiles = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
+		add(_mTiles);
 		
 		_player = new Player();
 		_map.loadEntities(placeEntities, "entities");
-		_player.bombs = 10;
+		_player.bombs = 2;
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -61,9 +58,9 @@ class PlayState extends FlxState {
 
 	override public function update():Void {
 		super.update();
-		FlxG.collide(_player, _mWalls);
+		FlxG.collide(_player, _mTiles);
 		FlxG.collide(_player, _grpBombs);
-		FlxG.collide(_grpBombs, _mWalls);
+		FlxG.collide(_grpBombs, _mTiles);
 		FlxG.collide(_grpBombs, _grpBombs);
 		
 		if (FlxG.keys.anyJustPressed(["E"])) {
