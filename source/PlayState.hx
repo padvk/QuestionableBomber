@@ -34,7 +34,7 @@ class PlayState extends FlxState {
 		_mTiles = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		add(_mTiles);
 		
-		_player = new Player();
+		_player = new Player(_mTiles);
 		_map.loadEntities(placeEntities, "entities");
 		_player.bombs = 2;
 		add(_player);
