@@ -35,13 +35,12 @@ class PlayState extends FlxState {
 		_mTiles = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		add(_mTiles);
 		
-		_grpBreakableWalls = new FlxTypedGroup<BreakableWall>();
-		add(_grpBreakableWalls);
-		placeBreakableWalls();
+		var tileIsFloor:Array<Int> = _mTiles.getTileInstances(1);
+		placeBreakableWalls(tileIsFloor.copy());
 		
 		_player = new Player(_mTiles);
-		_map.loadEntities(placeEntities, "entities");
 		_player.bombs = 2;
+		_map.loadEntities(placeEntities, "entities");
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -91,34 +90,20 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	private function placeBreakableWalls():Void {
-		var _tilesAmount:Int = _mTiles.widthInTiles * _mTiles.heightInTiles;
-		var _currentLine:Int = 1;
-		var _currentTile:Int = 1;
-		var _count:Int = 0;
-		var _tileIsFloor:Array<Int>; //Using a 1D array like a 2D array
-		_tileIsFloor = new Array<Int>();
+	public function placePlayer(tileIsFloor:Array<Int>):Void {
+		var index:Int = Std.random(tileIsFloor.length); //Where to spawn the player
+		//Get tile position, set to player
+		//make tile + surrounding tiles walkable in case they where made breakable
+	}
+	
+	private function placeBreakableWalls(tileIsFloor:Array<Int>):Void {
+		var count = Math.floor((tileIsFloor.length - 1) * 0.8);
 		
-		for ( i in 0...(_tilesAmount - 1) ) {
-			var _tileType = _mTiles.getTile((Math.round(_currentTile * _tileSize)), (Math.round(_currentLine * _tileSize)));
-			if (_tileType == 2) {
-				//Creating our array of available spaces (in tiles)
-				_tileIsFloor[_count] = ((_currentLine - 1) * _mTiles.widthInTiles) + _currentTile;
-				_count += 1;
-			}
-			_currentTile += 1;
-			if (_currentTile == _mTiles.widthInTiles) {
-				_currentLine += 1;
-				_currentTile = 1;
-			}
-		}
-		for (i in 0..._count) {
+		for (i in 0...count) {
 			//Reusing some variables
-			_currentLine = Std.int(_tileIsFloor[i]/_mTiles.widthInTiles);
-			_currentTile = _tileIsFloor[i] % _mTiles.widthInTiles;
-			var x:Float = _currentTile * _tileSize;
-			var y:Float = _currentLine * _tileSize;
-			_grpBreakableWalls.add(new BreakableWall(x, y));
+			var index:Int = Std.random(tileIsFloor.length);
+			_mTiles.setTileByIndex(tileIsFloor[index], 3, true);
+			tileIsFloor.remove(tileIsFloor[index]);
 		}
 	}
 }
