@@ -21,6 +21,7 @@ class PlayState extends FlxState {
 	private var _map:FlxOgmoLoader;
 	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float = 16.0;
+	private var _grpBreakableWalls:FlxTypedGroup<BreakableWall>;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	
 	/**
@@ -33,6 +34,10 @@ class PlayState extends FlxState {
 		_map = new FlxOgmoLoader(AssetPaths.room_001__oel);
 		_mTiles = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		add(_mTiles);
+		
+		_grpBreakableWalls = new FlxTypedGroup<BreakableWall>();
+		add(_grpBreakableWalls);
+		placeBreakableWalls();
 		
 		_player = new Player(_mTiles);
 		_map.loadEntities(placeEntities, "entities");
@@ -83,6 +88,37 @@ class PlayState extends FlxState {
 			var y:Float = (Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize) + 1;
 			_grpBombs.add(new Bomb(x, y, _player));
 			_player.bombs -= 1;
+		}
+	}
+	
+	private function placeBreakableWalls():Void {
+		var _tilesAmount:Int = _mTiles.widthInTiles * _mTiles.heightInTiles;
+		var _currentLine:Int = 1;
+		var _currentTile:Int = 1;
+		var _count:Int = 0;
+		var _tileIsFloor:Array<Int>; //Using a 1D array like a 2D array
+		_tileIsFloor = new Array<Int>();
+		
+		for ( i in 0...(_tilesAmount - 1) ) {
+			var _tileType = _mTiles.getTile((Math.round(_currentTile * _tileSize)), (Math.round(_currentLine * _tileSize)));
+			if (_tileType == 2) {
+				//Creating our array of available spaces (in tiles)
+				_tileIsFloor[_count] = ((_currentLine - 1) * _mTiles.widthInTiles) + _currentTile;
+				_count += 1;
+			}
+			_currentTile += 1;
+			if (_currentTile == _mTiles.widthInTiles) {
+				_currentLine += 1;
+				_currentTile = 1;
+			}
+		}
+		for (i in 0..._count) {
+			//Reusing some variables
+			_currentLine = Std.int(_tileIsFloor[i]/_mTiles.widthInTiles);
+			_currentTile = _tileIsFloor[i] % _mTiles.widthInTiles;
+			var x:Float = _currentTile * _tileSize;
+			var y:Float = _currentLine * _tileSize;
+			_grpBreakableWalls.add(new BreakableWall(x, y));
 		}
 	}
 }
