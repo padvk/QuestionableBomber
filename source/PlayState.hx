@@ -61,8 +61,6 @@ class PlayState extends FlxState {
 
 	override public function update():Void {
 		super.update();
-		FlxG.collide(_player, _mTiles);
-		FlxG.collide(_player, _grpBombs);
 		FlxG.collide(_grpBombs, _mTiles);
 		FlxG.collide(_grpBombs, _grpBombs);
 		
@@ -82,9 +80,9 @@ class PlayState extends FlxState {
 	
 	public function placeBomb():Void {
 		if (_player.bombs > 0) {
-			var x:Float = (Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize) + 1;
-			var y:Float = (Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize) + 1;
-			_grpBombs.add(new Bomb(x, y, _player));
+			var x:Float = (Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize);
+			var y:Float = (Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize);
+			_grpBombs.add(new Bomb(x, y, _player, _mTiles, _tileSize));
 			_player.bombs -= 1;
 		}
 	}
