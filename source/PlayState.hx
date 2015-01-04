@@ -21,7 +21,6 @@ class PlayState extends FlxState {
 	private var _map:FlxOgmoLoader;
 	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float = 16.0;
-	private var _grpBreakableWalls:FlxTypedGroup<BreakableWall>;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	
 	/**
@@ -38,9 +37,9 @@ class PlayState extends FlxState {
 		var tileIsFloor:Array<Int> = _mTiles.getTileInstances(1);
 		placeBreakableWalls(tileIsFloor.copy());
 		
-		_player = new Player(_mTiles);
+		placePlayer(tileIsFloor);
 		_player.bombs = 2;
-		_map.loadEntities(placeEntities, "entities");
+		//_map.loadEntities(placeEntities, "entities");
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -91,16 +90,40 @@ class PlayState extends FlxState {
 	}
 	
 	public function placePlayer(tileIsFloor:Array<Int>):Void {
-		var index:Int = Std.random(tileIsFloor.length); //Where to spawn the player
+		var index:Int = Std.random(tileIsFloor.length);
+		index = tileIsFloor[index]; //Where to spawn the player
 		//Get tile position, set to player
+		var x:Float = 0;
+		var indexCopy:Int = index;
+		while (indexCopy > _mTiles.widthInTiles) {
+			indexCopy -= _mTiles.widthInTiles;
+		}
+		x = indexCopy * _tileSize;
+		var y:Float = Math.floor(index / _mTiles.widthInTiles) * _tileSize; //NOT WORKING RIGHT NOW
+		_player = new Player(_mTiles, x, y);
+		
 		//make tile + surrounding tiles walkable in case they where made breakable
+		if (_mTiles.getTileByIndex(index) == 3) {
+			_mTiles.setTileByIndex(index, 1, true);
+		}
+		if (_mTiles.getTileByIndex(index - _mTiles.widthInTiles) == 3) {
+			_mTiles.setTileByIndex(index - _mTiles.widthInTiles, 1, true);
+		}
+		if (_mTiles.getTileByIndex(index + 1) == 3) {
+			_mTiles.setTileByIndex(index + 1, 1, true);
+		}
+		if (_mTiles.getTileByIndex(index + _mTiles.widthInTiles) == 3) {
+			_mTiles.setTileByIndex(index + _mTiles.widthInTiles, 1, true);
+		}
+		if (_mTiles.getTileByIndex(index - 1) == 3) {
+			_mTiles.setTileByIndex(index - 1, 1, true);
+		}
 	}
 	
 	private function placeBreakableWalls(tileIsFloor:Array<Int>):Void {
 		var count = Math.floor((tileIsFloor.length - 1) * 0.8);
 		
 		for (i in 0...count) {
-			//Reusing some variables
 			var index:Int = Std.random(tileIsFloor.length);
 			_mTiles.setTileByIndex(tileIsFloor[index], 3, true);
 			tileIsFloor.remove(tileIsFloor[index]);
