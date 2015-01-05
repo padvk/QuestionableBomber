@@ -35,17 +35,17 @@ class Bomb extends FlxSprite {
 			destroy();
 			_player.bombs += 1;
 			
-			if (_mTiles.getTile(Math.round(x), Math.round(y - _tileSize)) == 3) {
-				_mTiles.setTile(Math.round(x), Math.round(y - _tileSize), 1, true);
+			if (_mTiles.getTile(Math.round(x / _tileSize), Math.round((y - _tileSize) / _tileSize)) == 3) {
+				_mTiles.setTile(Math.round(x / _tileSize), Math.round((y - _tileSize) / _tileSize), 1, true);
 			}
-			if (_mTiles.getTile(Math.round(x), Math.round(y + _tileSize)) == 3) {
-				_mTiles.setTile(Math.round(x), Math.round(y + _tileSize), 1, true);
+			if (_mTiles.getTile(Math.round(x / _tileSize), Math.round((y + _tileSize) / _tileSize)) == 3) {
+				_mTiles.setTile(Math.round(x  / _tileSize), Math.round((y + _tileSize) / _tileSize), 1, true);
 			}
-			if (_mTiles.getTile(Math.round(x - _tileSize), Math.round(y)) == 3) {
-				_mTiles.setTile(Math.round(x - _tileSize), Math.round(y), 1, true);
+			if (_mTiles.getTile(Math.round((x - _tileSize) / _tileSize), Math.round(y / _tileSize)) == 3) {
+				_mTiles.setTile(Math.round((x - _tileSize) / _tileSize), Math.round(y / _tileSize), 1, true);
 			}
-			if (_mTiles.getTile(Math.round(x + _tileSize), Math.round(y)) == 3) {
-				_mTiles.setTile(Math.round(x + _tileSize), Math.round(y), 1, true);
+			if (_mTiles.getTile(Math.round((x + _tileSize) / _tileSize), Math.round(y / _tileSize)) == 3) {
+				_mTiles.setTile(Math.round((x + _tileSize) / _tileSize), Math.round(y / _tileSize), 1, true);
 			}
 		}
 	}

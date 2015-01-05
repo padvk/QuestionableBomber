@@ -39,7 +39,6 @@ class PlayState extends FlxState {
 		
 		placePlayer(tileIsFloor);
 		_player.bombs = 2;
-		//_map.loadEntities(placeEntities, "entities");
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
