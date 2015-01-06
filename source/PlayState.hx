@@ -72,15 +72,6 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	private function  placeEntities(entityName:String, entityData:Xml):Void {
-		var x:Int = Std.parseInt(entityData.get("x"));
-		var y:Int = Std.parseInt(entityData.get("y"));
-		if (entityName == "player") {
-			_player.x = x;
-			_player.y = y;
-		}
-	}
-	
 	public function placeBomb():Void {
 		if (_player.bombs > 0) {
 			var x:Float = (Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize);
@@ -165,16 +156,16 @@ class PlayState extends FlxState {
 			if (checkTile == 1) {
 				_playerMoving = true;
 				if (_up) {
-					FlxTween.tween(_player, { y:_player.y - 16 }, _moveTime, { complete:endTween });
+					FlxTween.tween(_player, { y:_player.y - 16 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.UP;
 				} else if (_down) {
-					FlxTween.tween(_player, { y:_player.y + 16 }, _moveTime, { complete:endTween });
+					FlxTween.tween(_player, { y:_player.y + 16 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.DOWN;
 				} else if (_left) {
-					FlxTween.tween(_player, { x:_player.x - 16 }, _moveTime, { complete:endTween });
+					FlxTween.tween(_player, { x:_player.x - 16 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.LEFT;
 				} else if (_right) {
-					FlxTween.tween(_player, { x:_player.x + 16 }, _moveTime, { complete:endTween });
+					FlxTween.tween(_player, { x:_player.x + 16 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.RIGHT;
 				}
 				
@@ -191,7 +182,7 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	private function endTween(T:FlxTween):Void {
+	private function endMovement(T:FlxTween):Void {
 		_playerMoving = false;
 	}
 }
