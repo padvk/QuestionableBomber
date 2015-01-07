@@ -14,7 +14,7 @@ import flixel.util.FlxMath;
  * @author ...
  */
 class Player extends FlxSprite {
-	public var bombs:Int = 0;
+	public var bombs:Int = 2;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
@@ -28,5 +28,17 @@ class Player extends FlxSprite {
 	
 	override public function update():Void {
 		super.update();
+	}
+	
+	public function animate():Void {
+		//Play animations
+		switch(facing) {
+			case FlxObject.LEFT, FlxObject.RIGHT:
+				animation.play("lr");
+			case FlxObject.UP:
+				animation.play("u");
+			case FlxObject.DOWN:
+				animation.play("d");
+		}
 	}
 }

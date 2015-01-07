@@ -41,7 +41,6 @@ class PlayState extends FlxState {
 		placeBreakableWalls(tileIsFloor.copy());
 		
 		placePlayer(tileIsFloor);
-		_player.bombs = 2;
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -74,9 +73,9 @@ class PlayState extends FlxState {
 	
 	public function placeBomb():Void {
 		if (_player.bombs > 0) {
-			var x:Float = (Math.floor((_player.x + (_player.offset.x/2)) / _tileSize) * _tileSize);
-			var y:Float = (Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize) * _tileSize);
-			_grpBombs.add(new Bomb(x, y, _player, _mTiles, _tileSize));
+			var xTile:Int = Math.floor((_player.x + (_player.offset.x/2)) / _tileSize);
+			var yTile:Int = Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize);
+			_grpBombs.add(new Bomb(xTile, yTile, _player, _mTiles, _tileSize));
 			_player.bombs -= 1;
 		}
 	}
@@ -169,15 +168,7 @@ class PlayState extends FlxState {
 					_player.facing = FlxObject.RIGHT;
 				}
 				
-				//Play animations
-				switch(_player.facing) {
-					case FlxObject.LEFT, FlxObject.RIGHT:
-						_player.animation.play("lr");
-					case FlxObject.UP:
-						_player.animation.play("u");
-					case FlxObject.DOWN:
-						_player.animation.play("d");
-				}
+				_player.animate();
 			}
 		}
 	}
