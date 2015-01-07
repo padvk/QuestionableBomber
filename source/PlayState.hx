@@ -23,6 +23,7 @@ class PlayState extends FlxState {
 	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float = 16.0;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
+	private var _tileIsBomb:Array<Bool>;
 	private var _playerMoving:Bool = false;
 	private var _moveTime:Float = .25;
 	
@@ -44,6 +45,10 @@ class PlayState extends FlxState {
 		add(_player);
 		
 		_grpBombs = new FlxTypedGroup<Bomb>();
+		_tileIsBomb = new Array<Bool>();
+		for (i in 0...((_mTiles.widthInTiles * _mTiles.heightInTiles) - 1)) {
+			_tileIsBomb[i] = false;
+		}
 		add(_grpBombs);
 		
 		FlxG.camera.follow(_player, FlxCamera.STYLE_LOCKON, 1);
@@ -75,7 +80,8 @@ class PlayState extends FlxState {
 		if (_player.bombs > 0) {
 			var xTile:Int = Math.floor((_player.x + (_player.offset.x/2)) / _tileSize);
 			var yTile:Int = Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize);
-			_grpBombs.add(new Bomb(xTile, yTile, _player, _mTiles, _tileSize));
+			_grpBombs.add(new Bomb(xTile, yTile, _player, _mTiles, _tileSize, _tileIsBomb));
+			_tileIsBomb[(yTile * _mTiles.widthInTiles) + xTile] = true;
 			_player.bombs -= 1;
 		}
 	}
@@ -138,6 +144,7 @@ class PlayState extends FlxState {
 			var checkTileX:Int = 0;
 			var checkTileY:Int = 0;
 			var checkTile:Int;
+			var checkTileIndex:Int;
 			if (_up) {
 				checkTileX = Math.round(_player.x/16);
 				checkTileY = Math.round((_player.y - 16)/16);
@@ -152,7 +159,8 @@ class PlayState extends FlxState {
 				checkTileY = Math.round(_player.y/16);
 			}
 			checkTile = _mTiles.getTile(checkTileX, checkTileY);
-			if (checkTile == 1) {
+			checkTileIndex = (checkTileY * _mTiles.widthInTiles) + checkTileX;
+			if (checkTile == 1 && _tileIsBomb[checkTileIndex] == false) {
 				_playerMoving = true;
 				if (_up) {
 					FlxTween.tween(_player, { y:_player.y - 16 }, _moveTime, { complete:endMovement });

@@ -14,12 +14,13 @@ class Bomb extends FlxSprite {
 	private var _blastPiercing:Bool = true;
 	private var _xTile:Int = 0;
 	private var _yTile:Int = 0;
+	private var _tileIsBomb:Array<Bool>;
 	
 	private var _timer = 60 * 3; //60 fps, so 3 seconds
 	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float;
 	
-	public function new(XTile:Int, YTile:Int, Owner:Player, Tiles:FlxTilemap, TileSize:Float) {
+	public function new(XTile:Int, YTile:Int, Owner:Player, Tiles:FlxTilemap, TileSize:Float, tileIsBomb:Array<Bool>) {
 		super(XTile * TileSize, YTile * TileSize);
 		loadGraphic(AssetPaths.bomb__png, false, 14, 14);
 		setSize(16, 16);
@@ -31,6 +32,8 @@ class Bomb extends FlxSprite {
 		_player = Owner;
 		_mTiles = Tiles;
 		_tileSize = TileSize;
+		
+		_tileIsBomb = tileIsBomb;
 		
 	}
 	
@@ -45,6 +48,7 @@ class Bomb extends FlxSprite {
 			destroy();
 			//Allow player to spawn a new bomb
 			_player.bombs += 1;
+			_tileIsBomb[(_yTile * _mTiles.widthInTiles) + _xTile] = false;
 			
 			//Destroy surrounding blocks
 			var checks:Array<Array<Int>> = [
