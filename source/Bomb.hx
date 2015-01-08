@@ -10,8 +10,8 @@ import flixel.tile.FlxTilemap;
 class Bomb extends FlxSprite {
 
 	private var _player:Player = null;
-	private var _blastSize:Int;
-	private var _blastPiercing:Bool;
+	private var _blastSize:Int = 1;
+	private var _blastPiercing:Bool = false;
 	private var _xTile:Int = 0;
 	private var _yTile:Int = 0;
 	
@@ -45,7 +45,7 @@ class Bomb extends FlxSprite {
 			destroy();
 			//Allow player to spawn a new bomb
 			_player.bombs += 1;
-			PlayState._tileIsBomb[(_yTile * PlayState._mTiles.widthInTiles) + _xTile] = false;
+			PlayState.bombTiles[(_yTile * PlayState.tileMap.widthInTiles) + _xTile] = null;
 			
 			//Destroy surrounding blocks
 			var checks:Array<Array<Int>> = [
@@ -56,15 +56,15 @@ class Bomb extends FlxSprite {
 			];
 			
 			for (i in 0 ... checks.length) {
-				for (l in 0 ... _blastSize) {
+				for (l in 1 ... _blastSize+1) {
 					var offset:Array<Int> = checks[i];
 					var xt:Int = _xTile + (offset[0] * l);
 					var yt:Int = _yTile + (offset[1] * l);
-					var type:Int = PlayState._mTiles.getTile(xt, yt);
+					var type:Int = PlayState.tileMap.getTile(xt, yt);
 					if (type == 3) { //Breakable, break
-						PlayState._mTiles.setTile(xt, yt, 1, true);
-						if (PlayState._powerUp[(yt * PlayState._mTiles.widthInTiles) + xt] != 0) {
-							PlayState._grpPowerups.add(new Powerups(xt, yt, PlayState._powerUp[(yt * PlayState._mTiles.widthInTiles) + xt]));
+						PlayState.tileMap.setTile(xt, yt, 1, true);
+						if (PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt] != 0) {
+							PlayState.grpPowerups.add(new Powerups(xt, yt, PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt]));
 						}
 						if (_blastPiercing == false) {
 							break; //No piercing, exit length loop

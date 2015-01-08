@@ -13,7 +13,7 @@ class Powerups extends FlxSprite {
 	 * 3: Pierce - Bomb blast will pass through as many soft blocks as the fire level will allow.
 	*/
 	public function new(xTile:Int, yTile:Int, type:Int) {
-		super(xTile * PlayState._tileSize, yTile * PlayState._tileSize);
+		super(xTile * PlayState.tileSize, yTile * PlayState.tileSize);
 		if (type == 1) {
 			p1();
 		} else if (type == 2) {
