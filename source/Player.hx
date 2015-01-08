@@ -14,7 +14,9 @@ import flixel.util.FlxMath;
  * @author ...
  */
 class Player extends FlxSprite {
-	public var bombs:Int = 2;
+	public var bombs:Int = 1;
+	public var _blastSize:Int = 1;
+	public var _blastPiercing:Bool = false;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);

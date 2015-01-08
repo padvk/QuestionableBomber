@@ -20,10 +20,13 @@ import flixel.util.FlxRect;
 class PlayState extends FlxState {
 	private var _player:Player;
 	private var _map:FlxOgmoLoader;
-	private var _mTiles:FlxTilemap;
-	private var _tileSize:Float = 16.0;
+	public static var _mTiles:FlxTilemap;
+	public static var _tileSize:Float = 16.0;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
-	private var _tileIsBomb:Array<Bool>;
+	public static var _tileIsBomb:Array<Bool>;
+	private var _tileIsBreakable:Array<Bool>;
+	public static var _powerUp:Array<Int>; //0 means no powerup, then >0 will go by the list in the powerups class
+	public static var _grpPowerups:FlxTypedGroup<Powerups>;
 	private var _playerMoving:Bool = false;
 	private var _moveTime:Float = .25;
 	
@@ -38,12 +41,24 @@ class PlayState extends FlxState {
 		_mTiles = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		add(_mTiles);
 		
+		//Placing breakable walls and powerups
 		var tileIsFloor:Array<Int> = _mTiles.getTileInstances(1);
+		_grpPowerups = new FlxTypedGroup<Powerups>();
+		_tileIsBreakable = new Array<Bool>();
+		_powerUp = new Array<Int>();
+		for (i in 0...((_mTiles.widthInTiles * _mTiles.heightInTiles) - 1)) {
+			_tileIsBreakable[i] = false;
+			_powerUp[i] = 0;
+		}
 		placeBreakableWalls(tileIsFloor.copy());
+		placePowerups(_tileIsBreakable.copy());
+		add(_grpPowerups);
 		
+		//Placing the player
 		placePlayer(tileIsFloor);
 		add(_player);
 		
+		//Adding bombs
 		_grpBombs = new FlxTypedGroup<Bomb>();
 		_tileIsBomb = new Array<Bool>();
 		for (i in 0...((_mTiles.widthInTiles * _mTiles.heightInTiles) - 1)) {
@@ -80,7 +95,7 @@ class PlayState extends FlxState {
 		if (_player.bombs > 0) {
 			var xTile:Int = Math.floor((_player.x + (_player.offset.x/2)) / _tileSize);
 			var yTile:Int = Math.floor((_player.y + (_player.offset.y / 2)) / _tileSize);
-			_grpBombs.add(new Bomb(xTile, yTile, _player, _mTiles, _tileSize, _tileIsBomb));
+			_grpBombs.add(new Bomb(xTile, yTile, _player, _tileSize, _player._blastSize, _player._blastPiercing));
 			_tileIsBomb[(yTile * _mTiles.widthInTiles) + xTile] = true;
 			_player.bombs -= 1;
 		}
@@ -123,7 +138,19 @@ class PlayState extends FlxState {
 		for (i in 0...count) {
 			var index:Int = Std.random(tileIsFloor.length);
 			_mTiles.setTileByIndex(tileIsFloor[index], 3, true);
+			_tileIsBreakable[tileIsFloor[index]] = true;
 			tileIsFloor.remove(tileIsFloor[index]);
+		}
+	}
+	
+	private function placePowerups(tileIsBreakable:Array<Bool>):Void {
+		var count:Int = Math.floor((tileIsBreakable.length - 1) * 0.5); //Half of the breakable walls to have powerups (for now)
+		
+		for (i in 0...count) {
+			var index:Int = Std.random(tileIsBreakable.length);
+			var type:Int = Std.random(4);
+			_powerUp[index] = type;
+			tileIsBreakable.remove(tileIsBreakable[index]);
 		}
 	}
 	

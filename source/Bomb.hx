@@ -10,17 +10,15 @@ import flixel.tile.FlxTilemap;
 class Bomb extends FlxSprite {
 
 	private var _player:Player = null;
-	private var _blastSize:Int = 5;
-	private var _blastPiercing:Bool = true;
+	private var _blastSize:Int;
+	private var _blastPiercing:Bool;
 	private var _xTile:Int = 0;
 	private var _yTile:Int = 0;
-	private var _tileIsBomb:Array<Bool>;
 	
 	private var _timer = 60 * 3; //60 fps, so 3 seconds
-	private var _mTiles:FlxTilemap;
 	private var _tileSize:Float;
 	
-	public function new(XTile:Int, YTile:Int, Owner:Player, Tiles:FlxTilemap, TileSize:Float, tileIsBomb:Array<Bool>) {
+	public function new(XTile:Int, YTile:Int, Owner:Player, TileSize:Float, blastSize:Int, blastPierce:Bool) {
 		super(XTile * TileSize, YTile * TileSize);
 		loadGraphic(AssetPaths.bomb__png, false, 14, 14);
 		setSize(16, 16);
@@ -30,11 +28,10 @@ class Bomb extends FlxSprite {
 		_yTile = YTile;
 		
 		_player = Owner;
-		_mTiles = Tiles;
 		_tileSize = TileSize;
 		
-		_tileIsBomb = tileIsBomb;
-		
+		_blastSize = blastSize;
+		_blastPiercing = blastPierce;
 	}
 	
 	override public function update():Void {
@@ -48,7 +45,7 @@ class Bomb extends FlxSprite {
 			destroy();
 			//Allow player to spawn a new bomb
 			_player.bombs += 1;
-			_tileIsBomb[(_yTile * _mTiles.widthInTiles) + _xTile] = false;
+			PlayState._tileIsBomb[(_yTile * PlayState._mTiles.widthInTiles) + _xTile] = false;
 			
 			//Destroy surrounding blocks
 			var checks:Array<Array<Int>> = [
@@ -63,9 +60,12 @@ class Bomb extends FlxSprite {
 					var offset:Array<Int> = checks[i];
 					var xt:Int = _xTile + (offset[0] * l);
 					var yt:Int = _yTile + (offset[1] * l);
-					var type:Int = _mTiles.getTile(xt, yt);
+					var type:Int = PlayState._mTiles.getTile(xt, yt);
 					if (type == 3) { //Breakable, break
-						_mTiles.setTile(xt, yt, 1, true);
+						PlayState._mTiles.setTile(xt, yt, 1, true);
+						if (PlayState._powerUp[(yt * PlayState._mTiles.widthInTiles) + xt] != 0) {
+							PlayState._grpPowerups.add(new Powerups(xt, yt, PlayState._powerUp[(yt * PlayState._mTiles.widthInTiles) + xt]));
+						}
 						if (_blastPiercing == false) {
 							break; //No piercing, exit length loop
 						}
