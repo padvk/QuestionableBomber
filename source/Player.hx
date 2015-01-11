@@ -3,23 +3,23 @@ package ;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.tile.FlxTilemap;
-import flixel.tweens.FlxTween;
-import flixel.util.FlxAngle;
-import flixel.util.FlxColor;
-import flixel.util.FlxMath;
 
 /**
  * ...
  * @author ...
  */
 class Player extends FlxSprite {
+	public var playerTileX:Int;
+	public var playerTileY:Int;
+	
 	public var bombs:Int = 1;
 	public var blastSize:Int = 1;
 	public var blastPiercing:Bool = false;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
+		playerTileX = Math.floor(X / PlayState.tileSize);
+		playerTileY = Math.floor(Y / PlayState.tileSize);
 		loadGraphic(AssetPaths.player__png, true, 16, 16);
 		setFacingFlip(FlxObject.LEFT, false, false);
 		setFacingFlip(FlxObject.RIGHT, true, false);

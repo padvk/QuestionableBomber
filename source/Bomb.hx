@@ -1,7 +1,6 @@
 package ;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.tile.FlxTilemap;
 
 /**
  * ...
@@ -64,7 +63,7 @@ class Bomb extends FlxSprite {
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
 						if (PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt] != 0) {
-							PlayState.grpPowerups.add(new Powerups(xt, yt, PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt]));
+							PlayState.grpPowerups.add(new Powerups(xt, yt, PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt], _player));
 						}
 						if (_blastPiercing == false) {
 							break; //No piercing, exit length loop

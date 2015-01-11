@@ -4,15 +4,10 @@ import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxObject;
-import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxTypedGroup;
-import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.tweens.FlxTween;
-import flixel.ui.FlxButton;
-import flixel.util.FlxMath;
-import flixel.util.FlxRect;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -105,14 +100,11 @@ class PlayState extends FlxState {
 		var index:Int = Std.random(tileIsFloor.length);
 		index = tileIsFloor[index]; //Where to spawn the player
 		//Get tile position, set to player
-		var indexCopy:Int = index;
-		while (indexCopy > tileMap.widthInTiles) {
-			indexCopy -= tileMap.widthInTiles;
-		}
 		
-		var x:Float = = indexCopy * tileSize;
-		var y:Float = Math.floor(index / tileMap.widthInTiles) * tileSize; //NOT WORKING RIGHT NOW
+		var x:Float = (index % tileMap.widthInTiles) * tileSize;//Math.floor(index / tileMap.widthInTiles) * tileSize; //Trying to get x tile from index
+		var y:Float = Math.floor(index / tileMap.widthInTiles) * tileSize;
 		_player = new Player(x, y);
+		
 		
 		//make tile + surrounding tiles walkable in case they where made breakable
 		if (tileMap.getTileByIndex(index) == 3) {
@@ -188,15 +180,19 @@ class PlayState extends FlxState {
 				if (up) {
 					FlxTween.tween(_player, { y:_player.y - tileSize }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.UP;
+					_player.playerTileY -= 1;
 				} else if (down) {
 					FlxTween.tween(_player, { y:_player.y + tileSize }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.DOWN;
+					_player.playerTileY += 1;
 				} else if (left) {
 					FlxTween.tween(_player, { x:_player.x - tileSize }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.LEFT;
+					_player.playerTileX -= 1;
 				} else if (right) {
 					FlxTween.tween(_player, { x:_player.x + tileSize }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.RIGHT;
+					_player.playerTileX += 1;
 				}
 				
 				_player.animate();
