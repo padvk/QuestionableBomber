@@ -24,29 +24,29 @@ class Powerups extends FlxSprite {
 		_yTile = yTile;
 		_index = (yTile * PlayState.tileMap.widthInTiles) + xTile;
 		if (type == 1) {
-			p1();
+			fire();
 		} else if (type == 2) {
-			p2();
+			bombUp();
 		} else if (type == 3) {
-			p3();
+			pierce();
 		}
 	}
 	
-	private function p1():Void {
-		loadGraphic(AssetPaths.p1__png, true, 16, 16);
+	private function fire():Void {
+		loadGraphic(AssetPaths.pFire__png, true, 16, 16);
 	}
 	
-	private function p2():Void {
-		loadGraphic(AssetPaths.p2__png, true, 16, 16);
+	private function bombUp():Void {
+		loadGraphic(AssetPaths.pBomb__png, true, 16, 16);
 	}
 	
-	private function p3():Void {
-		loadGraphic(AssetPaths.p3__png, true, 16, 16);
+	private function pierce():Void {
+		loadGraphic(AssetPaths.pPierce__png, true, 16, 16);
 	}
 	
 	override public function update():Void {
 		super.update();
-		if (((_player.playerTileY * PlayState.tileSize) + _player.playerTileX) == ((_yTile * PlayState.tileSize) + _xTile)) {
+		if (((_player.yTile * PlayState.tileSize) + _player.xTile) == ((_yTile * PlayState.tileSize) + _xTile)) {
 			destroy();
 		}
 	}

@@ -9,8 +9,8 @@ import flixel.FlxSprite;
  * @author ...
  */
 class Player extends FlxSprite {
-	public var playerTileX:Int;
-	public var playerTileY:Int;
+	public var xTile:Int;
+	public var yTile:Int;
 	
 	public var bombs:Int = 1;
 	public var blastSize:Int = 1;
@@ -18,8 +18,8 @@ class Player extends FlxSprite {
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
-		playerTileX = Math.floor(X / PlayState.tileSize);
-		playerTileY = Math.floor(Y / PlayState.tileSize);
+		xTile = Math.floor(X / PlayState.tileSize);
+		yTile = Math.floor(Y / PlayState.tileSize);
 		loadGraphic(AssetPaths.player__png, true, 16, 16);
 		setFacingFlip(FlxObject.LEFT, false, false);
 		setFacingFlip(FlxObject.RIGHT, true, false);

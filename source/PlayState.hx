@@ -178,21 +178,20 @@ class PlayState extends FlxState {
 			if (checkTile == 1 && bombTiles[checkTileIndex] == null) {
 				_playerMoving = true;
 				if (up) {
-					FlxTween.tween(_player, { y:_player.y - tileSize }, _moveTime, { complete:endMovement });
+					FlxTween.tween(_player, { y:_player.y - tileSize, yTile:_player.yTile - 1 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.UP;
-					_player.playerTileY -= 1;
+					_player.yTile -= 1;
 				} else if (down) {
-					FlxTween.tween(_player, { y:_player.y + tileSize }, _moveTime, { complete:endMovement });
+					FlxTween.tween(_player, { y:_player.y + tileSize, yTile:_player.yTile + 1 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.DOWN;
-					_player.playerTileY += 1;
+					_player.yTile += 1;
 				} else if (left) {
-					FlxTween.tween(_player, { x:_player.x - tileSize }, _moveTime, { complete:endMovement });
+					FlxTween.tween(_player, { x:_player.x - tileSize, xTile:_player.xTile - 1 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.LEFT;
-					_player.playerTileX -= 1;
+					_player.xTile -= 1;
 				} else if (right) {
-					FlxTween.tween(_player, { x:_player.x + tileSize }, _moveTime, { complete:endMovement });
+					FlxTween.tween(_player, { x:_player.x + tileSize, xTile:_player.xTile + 1 }, _moveTime, { complete:endMovement });
 					_player.facing = FlxObject.RIGHT;
-					_player.playerTileX += 1;
 				}
 				
 				_player.animate();
