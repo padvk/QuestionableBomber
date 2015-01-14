@@ -17,8 +17,8 @@ class Bomb extends FlxSprite {
 	private var _timer = 60 * 3; //60 fps, so 3 seconds
 	private var _tileSize:Float;
 	
-	public function new(XTile:Int, YTile:Int, Owner:Player, TileSize:Float, blastSize:Int, blastPierce:Bool) {
-		super(XTile * TileSize, YTile * TileSize);
+	public function new(XTile:Int, YTile:Int, Owner:Player, blastSize:Int, blastPierce:Bool) {
+		super(XTile * PlayState.tileSize, YTile * PlayState.tileSize);
 		loadGraphic(AssetPaths.bomb__png, false, 14, 14);
 		setSize(16, 16);
 		immovable = true; //For now ;)
@@ -27,7 +27,7 @@ class Bomb extends FlxSprite {
 		_yTile = YTile;
 		
 		_player = Owner;
-		_tileSize = TileSize;
+		_tileSize = PlayState.tileSize;
 		
 		_blastSize = blastSize;
 		_blastPiercing = blastPierce;
@@ -60,10 +60,17 @@ class Bomb extends FlxSprite {
 					var xt:Int = _xTile + (offset[0] * l);
 					var yt:Int = _yTile + (offset[1] * l);
 					var type:Int = PlayState.tileMap.getTile(xt, yt);
+					var pUp:Powerups = (PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt]);
+						
+					//PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] = null; //no
+					if ((pUp != null) && (pUp.drawn == true)) {
+						pUp.destroy();
+					}
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
-						if (PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt] != 0) {
-							PlayState.grpPowerups.add(new Powerups(xt, yt, PlayState.powerUp[(yt * PlayState.tileMap.widthInTiles) + xt], _player));
+						if (PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] != null) {
+							PlayState.grpPowerups.add(PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt]);
+							PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt].drawn = true;
 						}
 						if (_blastPiercing == false) {
 							break; //No piercing, exit length loop

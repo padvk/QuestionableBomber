@@ -16,7 +16,7 @@ class PlayState extends FlxState {
 	public static var tileMap:FlxTilemap;
 	public static var tileSize:Float = 16.0;
 	public static var bombTiles:Array<Bomb>;
-	public static var powerUp:Array<Int>; //0 means no powerup, then > 0 will go by the list in the powerups class
+	public static var powerUpTiles:Array<Powerups>; //0 means no powerup, then > 0 will go by the list in the powerups class
 	public static var grpPowerups:FlxTypedGroup<Powerups>;
 	
 	private var _player:Player;
@@ -41,10 +41,9 @@ class PlayState extends FlxState {
 		var tileIsFloor:Array<Int> = tileMap.getTileInstances(1);
 		grpPowerups = new FlxTypedGroup<Powerups>();
 		_tileIsBreakable = new Array<Bool>();
-		powerUp = new Array<Int>();
+		powerUpTiles = new Array<Powerups>();
 		for (i in 0...((tileMap.widthInTiles * tileMap.heightInTiles) - 1)) {
 			_tileIsBreakable[i] = false;
-			powerUp[i] = 0;
 		}
 		placeBreakableWalls(tileIsFloor.copy());
 		placePowerups(_tileIsBreakable.copy());
@@ -88,7 +87,7 @@ class PlayState extends FlxState {
 		if (_player.bombs > 0) {
 			var xTile:Int = Math.floor((_player.x + (_player.offset.x/2)) / tileSize);
 			var yTile:Int = Math.floor((_player.y + (_player.offset.y / 2)) / tileSize);
-			var bmb:Bomb = new Bomb(xTile, yTile, _player, tileSize, _player.blastSize, _player.blastPiercing);
+			var bmb:Bomb = new Bomb(xTile, yTile, _player, _player.blastSize, _player.blastPiercing);
 			
 			_grpBombs.add(bmb); //Add to render
 			bombTiles[(yTile * tileMap.widthInTiles) + xTile] = bmb; //Add to bomb tile array
@@ -141,7 +140,8 @@ class PlayState extends FlxState {
 		for (i in 0...count) {
 			var index:Int = Std.random(tileIsBreakable.length);
 			var type:Int = Std.random(4);
-			powerUp[index] = type;
+			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type, _player);
+			powerUpTiles[index] = pUp;
 			tileIsBreakable.remove(tileIsBreakable[index]);
 		}
 	}
