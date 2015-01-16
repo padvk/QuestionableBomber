@@ -63,14 +63,18 @@ class Bomb extends FlxSprite {
 					var pUp:Powerups = (PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt]);
 						
 					//PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] = null; //no
-					if ((pUp != null) && (pUp.drawn == true)) {
-						pUp.destroy();
+					if (pUp != null) {
+						if (pUp.drawn == true) {
+							pUp.destroy();
+							//PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] = null;
+						}
+						
 					}
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
-						if (PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] != null) {
-							PlayState.grpPowerups.add(PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt]);
-							PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt].drawn = true;
+						if (pUp != null) {
+							PlayState.grpPowerups.add(pUp);
+							pUp.drawn = true;
 						}
 						if (_blastPiercing == false) {
 							break; //No piercing, exit length loop

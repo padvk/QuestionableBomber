@@ -50,18 +50,19 @@ class Powerups extends FlxSprite {
 		super.update();
 		if (((_player.yTile * PlayState.tileSize) + _player.xTile) == ((_yTile * PlayState.tileSize) + _xTile)) {
 			destroy();
+			switch(_type) {
+				case 1:
+					_player.blastSize += 1;
+				case 2:
+					_player.bombs += 1;
+				case 3:
+					_player.blastPiercing = true;
+			}
 		}
 	}
 	
 	override public function destroy():Void {
-		switch(_type) {
-        case 1:
-            _player.blastSize += 1;
-        case 2:
-            _player.bombs += 1;
-        case 3:
-            _player.blastPiercing = true;
-		}
+		PlayState.grpPowerups.remove(this);
 		PlayState.powerUpTiles[_index] = null;
 		super.destroy();
 	}
