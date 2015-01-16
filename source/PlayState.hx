@@ -46,12 +46,13 @@ class PlayState extends FlxState {
 			_tileIsBreakable[i] = false;
 		}
 		placeBreakableWalls(tileIsFloor.copy());
-		placePowerups(_tileIsBreakable.copy());
-		add(grpPowerups);
 		
 		//Placing the player
 		placePlayer(tileIsFloor);
 		add(_player);
+		
+		placePowerups(_tileIsBreakable.copy());
+		add(grpPowerups);
 		
 		//Adding bombs
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -139,7 +140,7 @@ class PlayState extends FlxState {
 		
 		for (i in 0...count) {
 			var index:Int = Std.random(tileIsBreakable.length);
-			var type:Int = Std.random(4);
+			var type:Int = Std.random(3) + 1;
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type, _player);
 			powerUpTiles[index] = pUp;
 			tileIsBreakable.remove(tileIsBreakable[index]);

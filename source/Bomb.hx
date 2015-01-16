@@ -15,7 +15,6 @@ class Bomb extends FlxSprite {
 	private var _yTile:Int = 0;
 	
 	private var _timer = 60 * 3; //60 fps, so 3 seconds
-	private var _tileSize:Float;
 	
 	public function new(XTile:Int, YTile:Int, Owner:Player, blastSize:Int, blastPierce:Bool) {
 		super(XTile * PlayState.tileSize, YTile * PlayState.tileSize);
@@ -27,7 +26,6 @@ class Bomb extends FlxSprite {
 		_yTile = YTile;
 		
 		_player = Owner;
-		_tileSize = PlayState.tileSize;
 		
 		_blastSize = blastSize;
 		_blastPiercing = blastPierce;
