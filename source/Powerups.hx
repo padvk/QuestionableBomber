@@ -6,22 +6,20 @@ import flixel.FlxSprite;
  * @author ...
  */
 class Powerups extends FlxSprite {
-
-	private var _type:Int;
-	private var _player:Player;
+	public var _xTile:Int;
+	public var _yTile:Int;
+	public var _type:Int;
+	
 	private var _index:Int;
-	private var _xTile:Int;
-	private var _yTile:Int;
 	
 	public var drawn:Bool = false;
 	/**1: Fire - Increase the bomb blast radius
 	 * 2: Bomb-Up - Increase the number of bombs that can be set at one time.
 	 * 3: Pierce - Bomb blast will pass through as many soft blocks as the fire level will allow.
 	*/
-	public function new(xTile:Int, yTile:Int, type:Int, player:Player) {
+	public function new(xTile:Int, yTile:Int, type:Int) {
 		super(xTile * PlayState.tileSize, yTile * PlayState.tileSize);
 		_type = type;
-		_player = player;
 		_xTile = xTile;
 		_yTile = yTile;
 		_index = (yTile * PlayState.tileMap.widthInTiles) + xTile;
@@ -48,22 +46,10 @@ class Powerups extends FlxSprite {
 	
 	override public function update():Void {
 		super.update();
-		if (((_player.yTile * PlayState.tileSize) + _player.xTile) == ((_yTile * PlayState.tileSize) + _xTile)) {
-			destroy();
-			switch(_type) {
-				case 1:
-					_player.blastSize += 1;
-				case 2:
-					_player.bombs += 1;
-				case 3:
-					_player.blastPiercing = true;
-			}
-		}
 	}
 	
 	override public function destroy():Void {
 		PlayState.grpPowerups.remove(this);
-		PlayState.powerUpTiles[_index] = null;
 		super.destroy();
 	}
 }

@@ -13,7 +13,6 @@ class Bomb extends FlxSprite {
 	private var _blastPiercing:Bool = false;
 	private var _xTile:Int = 0;
 	private var _yTile:Int = 0;
-	
 	private var _timer = 60 * 3; //60 fps, so 3 seconds
 	
 	public function new(XTile:Int, YTile:Int, Owner:Player, blastSize:Int, blastPierce:Bool) {

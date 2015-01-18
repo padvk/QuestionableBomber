@@ -15,11 +15,14 @@ import flixel.tweens.FlxTween;
 class PlayState extends FlxState {
 	public static var tileMap:FlxTilemap;
 	public static var tileSize:Float = 16.0;
+	public static var players:Array<Player>;
+	public static var grpPlayers:FlxTypedGroup<Player>;
 	public static var bombTiles:Array<Bomb>;
 	public static var powerUpTiles:Array<Powerups>; //0 means no powerup, then > 0 will go by the list in the powerups class
 	public static var grpPowerups:FlxTypedGroup<Powerups>;
 	
-	private var _player:Player;
+	//private var _player:Player;
+	private var _playerID:Int = 0; //For now
 	private var _map:FlxOgmoLoader;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	private var _tileIsBreakable:Array<Bool>;
@@ -48,8 +51,10 @@ class PlayState extends FlxState {
 		placeBreakableWalls(tileIsFloor.copy());
 		
 		//Placing the player
-		placePlayer(tileIsFloor);
-		add(_player);
+		players = new Array<Player>();
+		grpPlayers = new FlxTypedGroup<Player>();
+		placePlayers(tileIsFloor);
+		add(grpPlayers);
 		
 		placePowerups(_tileIsBreakable.copy());
 		add(grpPowerups);
@@ -59,7 +64,7 @@ class PlayState extends FlxState {
 		bombTiles = new Array<Bomb>();
 		add(_grpBombs);
 		
-		FlxG.camera.follow(_player, FlxCamera.STYLE_LOCKON, 1);
+		FlxG.camera.follow(players[_playerID], FlxCamera.STYLE_LOCKON, 1);
 		super.create();
 	}
 	
@@ -85,43 +90,52 @@ class PlayState extends FlxState {
 	}
 	
 	public function placeBomb():Void {
-		if (_player.bombs > 0) {
-			var xTile:Int = Math.floor((_player.x + (_player.offset.x/2)) / tileSize);
-			var yTile:Int = Math.floor((_player.y + (_player.offset.y / 2)) / tileSize);
-			var bmb:Bomb = new Bomb(xTile, yTile, _player, _player.blastSize, _player.blastPiercing);
+		if (players[_playerID].bombs > 0) {
+			var xTile:Int = Math.floor((players[_playerID].x + (players[_playerID].offset.x/2)) / tileSize);
+			var yTile:Int = Math.floor((players[_playerID].y + (players[_playerID].offset.y / 2)) / tileSize);
+			var bmb:Bomb = new Bomb(xTile, yTile, players[_playerID], players[_playerID].blastSize, players[_playerID].blastPiercing);
 			
 			_grpBombs.add(bmb); //Add to render
 			bombTiles[(yTile * tileMap.widthInTiles) + xTile] = bmb; //Add to bomb tile array
-			_player.bombs -= 1; //Decrease player bombs
+			players[_playerID].bombs -= 1; //Decrease player bombs
 		}
 	}
 	
-	public function placePlayer(tileIsFloor:Array<Int>):Void {
-		var index:Int = Std.random(tileIsFloor.length);
-		index = tileIsFloor[index]; //Where to spawn the player
-		//Get tile position, set to player
+	public function placePlayers(tileIsFloor:Array<Int>):Void {
 		
-		var x:Float = (index % tileMap.widthInTiles) * tileSize;//Math.floor(index / tileMap.widthInTiles) * tileSize; //Trying to get x tile from index
-		var y:Float = Math.floor(index / tileMap.widthInTiles) * tileSize;
-		_player = new Player(x, y);
+		var playerCount:Int = 1; //For now
+		//Not using players.length because we havent given it values yet
+		for (i in 0...playerCount) {
+			//Get tile position, set to player
+			var index:Int = Std.random(tileIsFloor.length);
+			index = tileIsFloor[index]; //Where to spawn the player
+		
+			var x:Float = (index % tileMap.widthInTiles) * tileSize;
+			var y:Float = Math.floor(index / tileMap.widthInTiles) * tileSize;
+			players[i] = new Player(x, y);
+			grpPlayers.add(players[i]);
+			
+			//make tile + surrounding tiles walkable in case they where made breakable
+			if (tileMap.getTileByIndex(index) == 3) {
+				tileMap.setTileByIndex(index, 1, true);
+			}
+			if (tileMap.getTileByIndex(index - tileMap.widthInTiles) == 3) {
+				tileMap.setTileByIndex(index - tileMap.widthInTiles, 1, true);
+			}
+			if (tileMap.getTileByIndex(index + 1) == 3) {
+				tileMap.setTileByIndex(index + 1, 1, true);
+			}
+			if (tileMap.getTileByIndex(index + tileMap.widthInTiles) == 3) {
+				tileMap.setTileByIndex(index + tileMap.widthInTiles, 1, true);
+			}
+			if (tileMap.getTileByIndex(index - 1) == 3) {
+				tileMap.setTileByIndex(index - 1, 1, true);
+			}
+		}
 		
 		
-		//make tile + surrounding tiles walkable in case they where made breakable
-		if (tileMap.getTileByIndex(index) == 3) {
-			tileMap.setTileByIndex(index, 1, true);
-		}
-		if (tileMap.getTileByIndex(index - tileMap.widthInTiles) == 3) {
-			tileMap.setTileByIndex(index - tileMap.widthInTiles, 1, true);
-		}
-		if (tileMap.getTileByIndex(index + 1) == 3) {
-			tileMap.setTileByIndex(index + 1, 1, true);
-		}
-		if (tileMap.getTileByIndex(index + tileMap.widthInTiles) == 3) {
-			tileMap.setTileByIndex(index + tileMap.widthInTiles, 1, true);
-		}
-		if (tileMap.getTileByIndex(index - 1) == 3) {
-			tileMap.setTileByIndex(index - 1, 1, true);
-		}
+		
+		
 	}
 	
 	private function placeBreakableWalls(tileIsFloor:Array<Int>):Void {
@@ -141,9 +155,28 @@ class PlayState extends FlxState {
 		for (i in 0...count) {
 			var index:Int = Std.random(tileIsBreakable.length);
 			var type:Int = Std.random(3) + 1;
-			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type, _player);
+			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
 			powerUpTiles[index] = pUp;
 			tileIsBreakable.remove(tileIsBreakable[index]);
+		}
+	}
+	
+	private function checkCollisions() {
+		for (i in 1...players.length) {
+			for (j in 0...powerUpTiles.length - 1) {
+				if ((powerUpTiles[j] != null) && (((players[i - 1].yTile * tileSize) + players[i - 1].xTile) == ((powerUpTiles[j]._yTile * tileSize) + powerUpTiles[j]._xTile))) {
+					switch(powerUpTiles[j]._type) {
+						case 1:
+							players[i - 1].blastSize += 1;
+						case 2:
+							players[i - 1].bombs += 1;
+						case 3:
+							players[i - 1].blastPiercing = true;
+					}
+					powerUpTiles[j].destroy();
+					powerUpTiles[j] = null;
+				}
+			}
 		}
 	}
 	
@@ -161,17 +194,17 @@ class PlayState extends FlxState {
 			var checkTile:Int;
 			var checkTileIndex:Int;
 			if (up) {
-				checkTileX = Math.round(_player.x / tileSize);
-				checkTileY = Math.round((_player.y - tileSize) / tileSize);
+				checkTileX = Math.round(players[_playerID].x / tileSize);
+				checkTileY = Math.round((players[_playerID].y - tileSize) / tileSize);
 			} else if (down) {
-				checkTileX = Math.round(_player.x / tileSize);
-				checkTileY = Math.round((_player.y + tileSize) / tileSize);
+				checkTileX = Math.round(players[_playerID].x / tileSize);
+				checkTileY = Math.round((players[_playerID].y + tileSize) / tileSize);
 			} else if (left) {
-				checkTileX = Math.round((_player.x - tileSize) / tileSize);
-				checkTileY = Math.round(_player.y / tileSize);
+				checkTileX = Math.round((players[_playerID].x - tileSize) / tileSize);
+				checkTileY = Math.round(players[_playerID].y / tileSize);
 			} else if (right) {
-				checkTileX = Math.round((_player.x + tileSize) / tileSize);
-				checkTileY = Math.round(_player.y / tileSize);
+				checkTileX = Math.round((players[_playerID].x + tileSize) / tileSize);
+				checkTileY = Math.round(players[_playerID].y / tileSize);
 			}
 			
 			checkTile = tileMap.getTile(checkTileX, checkTileY);
@@ -179,23 +212,24 @@ class PlayState extends FlxState {
 			if (checkTile == 1 && bombTiles[checkTileIndex] == null) {
 				_playerMoving = true;
 				if (up) {
-					FlxTween.tween(_player, { y:_player.y - tileSize, yTile:_player.yTile - 1 }, _moveTime, { complete:endMovement });
-					_player.facing = FlxObject.UP;
-					_player.yTile -= 1;
+					FlxTween.tween(players[_playerID], { y:players[_playerID].y - tileSize, yTile:players[_playerID].yTile - 1 }, _moveTime, { complete:endMovement });
+					players[_playerID].facing = FlxObject.UP;
+					players[_playerID].yTile -= 1;
 				} else if (down) {
-					FlxTween.tween(_player, { y:_player.y + tileSize, yTile:_player.yTile + 1 }, _moveTime, { complete:endMovement });
-					_player.facing = FlxObject.DOWN;
-					_player.yTile += 1;
+					FlxTween.tween(players[_playerID], { y:players[_playerID].y + tileSize, yTile:players[_playerID].yTile + 1 }, _moveTime, { complete:endMovement });
+					players[_playerID].facing = FlxObject.DOWN;
+					players[_playerID].yTile += 1;
 				} else if (left) {
-					FlxTween.tween(_player, { x:_player.x - tileSize, xTile:_player.xTile - 1 }, _moveTime, { complete:endMovement });
-					_player.facing = FlxObject.LEFT;
-					_player.xTile -= 1;
+					FlxTween.tween(players[_playerID], { x:players[_playerID].x - tileSize, xTile:players[_playerID].xTile - 1 }, _moveTime, { complete:endMovement });
+					players[_playerID].facing = FlxObject.LEFT;
+					players[_playerID].xTile -= 1;
 				} else if (right) {
-					FlxTween.tween(_player, { x:_player.x + tileSize, xTile:_player.xTile + 1 }, _moveTime, { complete:endMovement });
-					_player.facing = FlxObject.RIGHT;
+					FlxTween.tween(players[_playerID], { x:players[_playerID].x + tileSize, xTile:players[_playerID].xTile + 1 }, _moveTime, { complete:endMovement });
+					players[_playerID].facing = FlxObject.RIGHT;
 				}
 				
-				_player.animate();
+				players[_playerID].animate();
+				checkCollisions();
 			}
 		}
 	}
