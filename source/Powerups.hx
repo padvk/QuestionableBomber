@@ -49,7 +49,6 @@ class Powerups extends FlxSprite {
 	}
 	
 	override public function destroy():Void {
-		PlayState.grpPowerups.remove(this);
 		super.destroy();
 	}
 }

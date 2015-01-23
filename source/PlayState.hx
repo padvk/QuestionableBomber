@@ -23,6 +23,7 @@ class PlayState extends FlxState {
 	
 	//private var _player:Player;
 	private var _playerID:Int = 0; //For now
+	private var _playerCount:Int = 1; //For now
 	private var _map:FlxOgmoLoader;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	private var _tileIsBreakable:Array<Bool>;
@@ -81,6 +82,7 @@ class PlayState extends FlxState {
 	override public function update():Void {
 		super.update();
 		playerMovement();
+		checkCollisions();
 		FlxG.collide(_grpBombs, tileMap);
 		FlxG.collide(_grpBombs, _grpBombs);
 		
@@ -102,10 +104,8 @@ class PlayState extends FlxState {
 	}
 	
 	public function placePlayers(tileIsFloor:Array<Int>):Void {
-		
-		var playerCount:Int = 1; //For now
 		//Not using players.length because we havent given it values yet
-		for (i in 0...playerCount) {
+		for (i in 0..._playerCount) {
 			//Get tile position, set to player
 			var index:Int = Std.random(tileIsFloor.length);
 			index = tileIsFloor[index]; //Where to spawn the player
@@ -132,10 +132,6 @@ class PlayState extends FlxState {
 				tileMap.setTileByIndex(index - 1, 1, true);
 			}
 		}
-		
-		
-		
-		
 	}
 	
 	private function placeBreakableWalls(tileIsFloor:Array<Int>):Void {
@@ -162,19 +158,24 @@ class PlayState extends FlxState {
 	}
 	
 	private function checkCollisions() {
-		for (i in 1...players.length) {
-			for (j in 0...powerUpTiles.length - 1) {
-				if ((powerUpTiles[j] != null) && (((players[i - 1].yTile * tileSize) + players[i - 1].xTile) == ((powerUpTiles[j]._yTile * tileSize) + powerUpTiles[j]._xTile))) {
-					switch(powerUpTiles[j]._type) {
+		for (i in 0...players.length - 1) {
+			var p:Player = players[i];
+			for (j in 0...(tileMap.widthInTiles * tileMap.heightInTiles) - 1) {
+				var pUp:Powerups = powerUpTiles[j];
+				if ((pUp != null) && (((p.yTile * tileMap.widthInTiles) + p.xTile) == ((pUp._yTile * tileMap.widthInTiles) + pUp._xTile))) {
+					switch(pUp._type) {
 						case 1:
-							players[i - 1].blastSize += 1;
+							p.blastSize += 1;
 						case 2:
-							players[i - 1].bombs += 1;
+							p.bombs += 1;
 						case 3:
-							players[i - 1].blastPiercing = true;
+							p.blastPiercing = true;
+						break;
 					}
-					powerUpTiles[j].destroy();
-					powerUpTiles[j] = null;
+					grpPowerups.remove(pUp);
+					pUp.destroy();
+					pUp = null;
+					break;
 				}
 			}
 		}
@@ -229,7 +230,6 @@ class PlayState extends FlxState {
 				}
 				
 				players[_playerID].animate();
-				checkCollisions();
 			}
 		}
 	}
