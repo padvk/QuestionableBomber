@@ -19,13 +19,13 @@ class PlayState extends FlxState {
 	public static var grpPlayers:FlxTypedGroup<Player>;
 	public static var bombTiles:Array<Bomb>;
 	public static var powerUpTiles:Array<Powerups>; //0 means no powerup, then > 0 will go by the list in the powerups class
-	public static var grpPowerups:FlxTypedGroup<Powerups>;
 	
 	//private var _player:Player;
 	private var _playerID:Int = 0; //For now
 	private var _playerCount:Int = 1; //For now
 	private var _map:FlxOgmoLoader;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
+	private var _grpPowerups:FlxTypedGroup<Powerups>;
 	private var _tileIsBreakable:Array<Bool>;
 	private var _playerMoving:Bool = false;
 	private var _moveTime:Float = .15;
@@ -43,7 +43,7 @@ class PlayState extends FlxState {
 		
 		//Placing breakable walls and powerups
 		var tileIsFloor:Array<Int> = tileMap.getTileInstances(1);
-		grpPowerups = new FlxTypedGroup<Powerups>();
+		_grpPowerups = new FlxTypedGroup<Powerups>();
 		_tileIsBreakable = new Array<Bool>();
 		powerUpTiles = new Array<Powerups>();
 		for (i in 0...((tileMap.widthInTiles * tileMap.heightInTiles) - 1)) {
@@ -58,7 +58,7 @@ class PlayState extends FlxState {
 		add(grpPlayers);
 		
 		placePowerups(_tileIsBreakable.copy());
-		add(grpPowerups);
+		add(_grpPowerups);
 		
 		//Adding bombs
 		_grpBombs = new FlxTypedGroup<Bomb>();
@@ -92,14 +92,16 @@ class PlayState extends FlxState {
 	}
 	
 	public function placeBomb():Void {
-		if (players[_playerID].bombs > 0) {
-			var xTile:Int = Math.floor((players[_playerID].x + (players[_playerID].offset.x/2)) / tileSize);
-			var yTile:Int = Math.floor((players[_playerID].y + (players[_playerID].offset.y / 2)) / tileSize);
-			var bmb:Bomb = new Bomb(xTile, yTile, players[_playerID], players[_playerID].blastSize, players[_playerID].blastPiercing);
+		var p:Player = players[_playerID];
+		if (p.bombs > 0) {
+			trace("Player has " + p.bombs + " bombs.");
+			var xTile:Int = Math.floor((p.x + (p.offset.x/2)) / tileSize);
+			var yTile:Int = Math.floor((p.y + (p.offset.y / 2)) / tileSize);
+			var bmb:Bomb = new Bomb(xTile, yTile, p, p.blastSize, p.blastPiercing);
 			
 			_grpBombs.add(bmb); //Add to render
 			bombTiles[(yTile * tileMap.widthInTiles) + xTile] = bmb; //Add to bomb tile array
-			players[_playerID].bombs -= 1; //Decrease player bombs
+			p.bombs -= 1; //Decrease player bombs
 		}
 	}
 	
@@ -153,16 +155,18 @@ class PlayState extends FlxState {
 			var type:Int = Std.random(3) + 1;
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
 			powerUpTiles[index] = pUp;
+			_grpPowerups.add(pUp);
 			tileIsBreakable.remove(tileIsBreakable[index]);
 		}
 	}
 	
 	private function checkCollisions() {
-		for (i in 0...players.length - 1) {
+		for (i in 0...players.length) {
 			var p:Player = players[i];
-			for (j in 0...(tileMap.widthInTiles * tileMap.heightInTiles) - 1) {
+			for (j in 0...(tileMap.widthInTiles * tileMap.heightInTiles)) {
 				var pUp:Powerups = powerUpTiles[j];
-				if ((pUp != null) && (((p.yTile * tileMap.widthInTiles) + p.xTile) == ((pUp._yTile * tileMap.widthInTiles) + pUp._xTile))) {
+				if (pUp != null && (p.yTile == pUp._yTile && p.xTile == pUp._xTile)) {
+					trace("Powerup hit " + pUp._type);
 					switch(pUp._type) {
 						case 1:
 							p.blastSize += 1;
@@ -170,12 +174,13 @@ class PlayState extends FlxState {
 							p.bombs += 1;
 						case 3:
 							p.blastPiercing = true;
-						break;
 					}
-					grpPowerups.remove(pUp);
+					
+					powerUpTiles[j] = null;
+					_grpPowerups.remove(pUp);
 					pUp.destroy();
 					pUp = null;
-					break;
+					return;
 				}
 			}
 		}

@@ -70,7 +70,6 @@ class Bomb extends FlxSprite {
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
 						if (pUp != null) {
-							PlayState.grpPowerups.add(pUp);
 							pUp.drawn = true;
 						}
 						if (_blastPiercing == false) {
