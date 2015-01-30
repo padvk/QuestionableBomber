@@ -26,7 +26,6 @@ class PlayState extends FlxState {
 	private var _map:FlxOgmoLoader;
 	private var _grpBombs:FlxTypedGroup<Bomb>;
 	private var _grpPowerups:FlxTypedGroup<Powerups>;
-	private var _tileIsBreakable:Array<Bool>;
 	private var _playerMoving:Bool = false;
 	private var _moveTime:Float = .15;
 	
@@ -35,29 +34,26 @@ class PlayState extends FlxState {
 	 */
 	override public function create():Void {
 		//Turn the mouse off
-		FlxG.mouse.visible = false;
+		FlxG.mouse.visible = true;
 		
 		_map = new FlxOgmoLoader(AssetPaths.room_001__oel);
 		tileMap = _map.loadTilemap(AssetPaths.tiles__png, 16, 16, "walls");
 		add(tileMap);
 		
 		//Placing breakable walls and powerups
-		var tileIsFloor:Array<Int> = tileMap.getTileInstances(1);
+		var floorIndices:Array<Int> = tileMap.getTileInstances(1);
 		_grpPowerups = new FlxTypedGroup<Powerups>();
-		_tileIsBreakable = new Array<Bool>();
 		powerUpTiles = new Array<Powerups>();
-		for (i in 0...((tileMap.widthInTiles * tileMap.heightInTiles) - 1)) {
-			_tileIsBreakable[i] = false;
-		}
-		placeBreakableWalls(tileIsFloor.copy());
+		placeBreakableWalls(floorIndices);
 		
 		//Placing the player
 		players = new Array<Player>();
 		grpPlayers = new FlxTypedGroup<Player>();
-		placePlayers(tileIsFloor);
+		placePlayers(floorIndices);
 		add(grpPlayers);
 		
-		placePowerups(_tileIsBreakable.copy());
+		var breakableIndices:Array<Int> = tileMap.getTileInstances(3);
+		placePowerups(breakableIndices);
 		add(_grpPowerups);
 		
 		//Adding bombs
@@ -81,8 +77,8 @@ class PlayState extends FlxState {
 
 	override public function update():Void {
 		super.update();
-		playerMovement();
 		checkCollisions();
+		playerMovement();
 		FlxG.collide(_grpBombs, tileMap);
 		FlxG.collide(_grpBombs, _grpBombs);
 		
@@ -105,12 +101,12 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	public function placePlayers(tileIsFloor:Array<Int>):Void {
+	public function placePlayers(floorIndices:Array<Int>):Void {
 		//Not using players.length because we havent given it values yet
 		for (i in 0..._playerCount) {
 			//Get tile position, set to player
-			var index:Int = Std.random(tileIsFloor.length);
-			index = tileIsFloor[index]; //Where to spawn the player
+			var index:Int = Std.random(floorIndices.length);
+			index = floorIndices[index]; //Where to spawn the player
 		
 			var x:Float = (index % tileMap.widthInTiles) * tileSize;
 			var y:Float = Math.floor(index / tileMap.widthInTiles) * tileSize;
@@ -136,27 +132,33 @@ class PlayState extends FlxState {
 		}
 	}
 	
-	private function placeBreakableWalls(tileIsFloor:Array<Int>):Void {
-		var count = Math.floor((tileIsFloor.length - 1) * 0.8);
+	private function placeBreakableWalls(indices:Array<Int>):Void {
+		var floorIndices:Array<Int> = indices.copy();
+		
+		var count = Math.floor((floorIndices.length - 1) * 0.8);
+		trace("Placing " +  count + " breakable walls on");
 		
 		for (i in 0...count) {
-			var index:Int = Std.random(tileIsFloor.length);
-			tileMap.setTileByIndex(tileIsFloor[index], 3, true);
-			_tileIsBreakable[tileIsFloor[index]] = true;
-			tileIsFloor.remove(tileIsFloor[index]);
+			var index:Int = Std.random(floorIndices.length);
+			tileMap.setTileByIndex(floorIndices[index], 3, true);
+			floorIndices.remove(floorIndices[index]);
 		}
 	}
 	
-	private function placePowerups(tileIsBreakable:Array<Bool>):Void {
-		var count:Int = Math.floor((tileIsBreakable.length - 1) * 0.5); //Half of the breakable walls to have powerups (for now)
+	private function placePowerups(indices:Array<Int>):Void {
+		var breakableIndices:Array<Int> = indices.copy();
+		
+		var count:Int = Math.floor(breakableIndices.length * 0.5); //Half of the breakable walls to have powerups (for now)
+		trace("Placing " +  count + " powerups");
 		
 		for (i in 0...count) {
-			var index:Int = Std.random(tileIsBreakable.length);
+			var index:Int = breakableIndices[Std.random(breakableIndices.length)];
 			var type:Int = Std.random(3) + 1;
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
+			pUp.visible = false;
 			powerUpTiles[index] = pUp;
 			_grpPowerups.add(pUp);
-			tileIsBreakable.remove(tileIsBreakable[index]);
+			breakableIndices.remove(index);
 		}
 	}
 	
@@ -180,7 +182,7 @@ class PlayState extends FlxState {
 					_grpPowerups.remove(pUp);
 					pUp.destroy();
 					pUp = null;
-					return;
+					break;
 				}
 			}
 		}
@@ -220,15 +222,12 @@ class PlayState extends FlxState {
 				if (up) {
 					FlxTween.tween(players[_playerID], { y:players[_playerID].y - tileSize, yTile:players[_playerID].yTile - 1 }, _moveTime, { complete:endMovement });
 					players[_playerID].facing = FlxObject.UP;
-					players[_playerID].yTile -= 1;
 				} else if (down) {
 					FlxTween.tween(players[_playerID], { y:players[_playerID].y + tileSize, yTile:players[_playerID].yTile + 1 }, _moveTime, { complete:endMovement });
 					players[_playerID].facing = FlxObject.DOWN;
-					players[_playerID].yTile += 1;
 				} else if (left) {
 					FlxTween.tween(players[_playerID], { x:players[_playerID].x - tileSize, xTile:players[_playerID].xTile - 1 }, _moveTime, { complete:endMovement });
 					players[_playerID].facing = FlxObject.LEFT;
-					players[_playerID].xTile -= 1;
 				} else if (right) {
 					FlxTween.tween(players[_playerID], { x:players[_playerID].x + tileSize, xTile:players[_playerID].xTile + 1 }, _moveTime, { complete:endMovement });
 					players[_playerID].facing = FlxObject.RIGHT;
