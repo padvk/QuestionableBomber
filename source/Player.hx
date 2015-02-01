@@ -13,6 +13,7 @@ class Player extends FlxSprite {
 	public var yTile:Int;
 	
 	public var bombs:Int = 1;
+	public var maxBombs:Int = 1; //Start at 1, then increase until 5
 	public var blastSize:Int = 1;
 	public var blastPiercing:Bool = false;
 

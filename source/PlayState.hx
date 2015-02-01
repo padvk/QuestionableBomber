@@ -152,16 +152,27 @@ class PlayState extends FlxState {
 		var breakableIndices:Array<Int> = indices.copy();
 		
 		var count:Int = Math.floor(breakableIndices.length * 0.5); //Half of the breakable walls to have powerups (for now)
+		var bombCount:Int = Math.floor(count * .4);
+		var fireCount:Int = Math.floor(count * .4);
+		var pierceCount:Int = Math.floor(count * .2);
 		
 		for (i in 0...count) {
 			var index:Int = breakableIndices[Std.random(breakableIndices.length)];
-			var type:Int = Std.random(3) + 1;
+			var type:Int = 0;
+			if (i <= Math.floor(count * .4)) {
+				type = 1;
+			} else if (i <= Math.floor(count * 0.8) && i > Math.floor(count * .4)) {
+				type = 2;
+			} else if (i > Math.floor(count * .8)) {
+				type = 3;
+			}
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
 			pUp.visible = false;
 			powerUpTiles[index] = pUp;
 			_grpPowerups.add(pUp);
 			breakableIndices.remove(index);
 		}
+		
 	}
 	
 	private function checkCollisions() {
@@ -172,9 +183,15 @@ class PlayState extends FlxState {
 				if (pUp != null && (p.yTile == pUp._yTile && p.xTile == pUp._xTile)) {
 					switch(pUp._type) {
 						case 1:
-							p.blastSize += 1;
+							if (p.blastSize < 5) { //Maximum of 5 blast length
+								p.blastSize += 1;
+							}
 						case 2:
-							p.bombs += 1;
+							if (p.maxBombs < 5) { //Maximum of 5 bombs per player
+								p.maxBombs += 1;
+								p.bombs += 1;
+								trace("Player's bombs: " + p.bombs);
+							}
 						case 3:
 							p.blastPiercing = true;
 					}
