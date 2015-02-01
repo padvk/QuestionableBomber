@@ -10,7 +10,7 @@ class Explosion  extends FlxSprite {
 	public var xTile:Int;
 	public var yTile:Int;
 	
-	private var _timer:Int = 1 * 60;
+	private var _timer:Int = 15;
 
 	public function new(xT:Int, yT:Int) {
 		super(xT * PlayState.tileSize, yT * PlayState.tileSize);
