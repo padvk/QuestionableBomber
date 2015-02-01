@@ -40,7 +40,6 @@ class Bomb extends FlxSprite {
 			//Destroy own sprite
 			destroy();
 			//Allow player to spawn a new bomb
-			_player.bombs += 1;
 			PlayState.bombTiles[(_yTile * PlayState.tileMap.widthInTiles) + _xTile] = null;
 			
 			//Destroy surrounding blocks
@@ -63,19 +62,25 @@ class Bomb extends FlxSprite {
 					var type:Int = PlayState.tileMap.getTile(xt, yt);
 					var index:Int = (yt * PlayState.tileMap.widthInTiles) + xt;
 					var pUp:Powerups = (PlayState.powerUpTiles[index]);
+					var bmb:Bomb = PlayState.bombTiles[index];
 						
-					//PlayState.powerUpTiles[(yt * PlayState.tileMap.widthInTiles) + xt] = null; //no
 					if (pUp != null) {
 						if (pUp.visible == true) {
 							pUp.destroy();
 							PlayState.powerUpTiles[index] = null;
 						}
-						
 					}
+					
 					if (type == 3 || type == 1) {
 						var exp:Explosion = new Explosion(xt, yt);
 						PlayState.grpExplosions.add(exp);
 					}
+					
+					if (bmb != null) {
+						bmb.destroy();
+						PlayState.bombTiles[index] = null;
+					}
+					
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
 						if (pUp != null) {
@@ -90,5 +95,10 @@ class Bomb extends FlxSprite {
 				}
 			}
 		}
+	}
+	
+	override public function destroy():Void {
+		super.destroy();
+		_player.bombs += 1;
 	}
 }

@@ -95,7 +95,6 @@ class PlayState extends FlxState {
 	public function placeBomb():Void {
 		var p:Player = players[_playerID];
 		if (p.bombs > 0) {
-			trace("Player has " + p.bombs + " bombs.");
 			var xTile:Int = Math.floor((p.x + (p.offset.x/2)) / tileSize);
 			var yTile:Int = Math.floor((p.y + (p.offset.y / 2)) / tileSize);
 			var bmb:Bomb = new Bomb(xTile, yTile, p, p.blastSize, p.blastPiercing);
@@ -141,7 +140,6 @@ class PlayState extends FlxState {
 		var floorIndices:Array<Int> = indices.copy();
 		
 		var count = Math.floor((floorIndices.length - 1) * 0.8);
-		trace("Placing " +  count + " breakable walls on");
 		
 		for (i in 0...count) {
 			var index:Int = Std.random(floorIndices.length);
@@ -154,7 +152,6 @@ class PlayState extends FlxState {
 		var breakableIndices:Array<Int> = indices.copy();
 		
 		var count:Int = Math.floor(breakableIndices.length * 0.5); //Half of the breakable walls to have powerups (for now)
-		trace("Placing " +  count + " powerups");
 		
 		for (i in 0...count) {
 			var index:Int = breakableIndices[Std.random(breakableIndices.length)];
@@ -173,7 +170,6 @@ class PlayState extends FlxState {
 			for (j in 0...(tileMap.widthInTiles * tileMap.heightInTiles)) {
 				var pUp:Powerups = powerUpTiles[j];
 				if (pUp != null && (p.yTile == pUp._yTile && p.xTile == pUp._xTile)) {
-					trace("Powerup hit " + pUp._type);
 					switch(pUp._type) {
 						case 1:
 							p.blastSize += 1;
