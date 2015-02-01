@@ -20,6 +20,7 @@ class PlayState extends FlxState {
 	public static var bombTiles:Array<Bomb>;
 	public static var powerUpTiles:Array<Powerups>; //0 means no powerup, then > 0 will go by the list in the powerups class
 	public static var grpExplosions:FlxTypedGroup<Explosion>;
+	public static var theHud:HUD; //Not just "hud" cause "HUD" is already a class
 	
 	//private var _player:Player;
 	private var _playerID:Int = 0; //For now
@@ -66,6 +67,9 @@ class PlayState extends FlxState {
 		grpExplosions = new FlxTypedGroup<Explosion>();
 		add(grpExplosions);
 		
+		theHud = new HUD();
+		add(theHud);
+		
 		FlxG.camera.follow(players[_playerID], FlxCamera.STYLE_LOCKON, 1);
 		super.create();
 	}
@@ -102,6 +106,8 @@ class PlayState extends FlxState {
 			_grpBombs.add(bmb); //Add to render
 			bombTiles[(yTile * tileMap.widthInTiles) + xTile] = bmb; //Add to bomb tile array
 			p.bombs -= 1; //Decrease player bombs
+			
+			theHud.updateHUD(p.bombs, p.blastSize);
 		}
 	}
 	
@@ -195,6 +201,7 @@ class PlayState extends FlxState {
 						case 3:
 							p.blastPiercing = true;
 					}
+					theHud.updateHUD(p.bombs, p.blastSize);
 					
 					powerUpTiles[j] = null;
 					_grpPowerups.remove(pUp);

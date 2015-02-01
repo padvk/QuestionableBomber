@@ -39,6 +39,7 @@ class Bomb extends FlxSprite {
 		//Timer 0? Explode!
 		if (_timer <= 0) {
 			explode();
+			PlayState.theHud.updateHUD(_player.bombs, _player.blastSize);
 		}
 	}
 	
