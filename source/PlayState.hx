@@ -19,6 +19,7 @@ class PlayState extends FlxState {
 	public static var grpPlayers:FlxTypedGroup<Player>;
 	public static var bombTiles:Array<Bomb>;
 	public static var powerUpTiles:Array<Powerups>; //0 means no powerup, then > 0 will go by the list in the powerups class
+	public static var grpExplosions:FlxTypedGroup<Explosion>;
 	
 	//private var _player:Player;
 	private var _playerID:Int = 0; //For now
@@ -60,6 +61,10 @@ class PlayState extends FlxState {
 		_grpBombs = new FlxTypedGroup<Bomb>();
 		bombTiles = new Array<Bomb>();
 		add(_grpBombs);
+		
+		//Setting up explosions
+		grpExplosions = new FlxTypedGroup<Explosion>();
+		add(grpExplosions);
 		
 		FlxG.camera.follow(players[_playerID], FlxCamera.STYLE_LOCKON, 1);
 		super.create();

@@ -51,6 +51,10 @@ class Bomb extends FlxSprite {
 				[1, 0],
 			];
 			
+			//Adding the central explosion
+			var centExp:Explosion = new Explosion(_xTile, _yTile);
+			PlayState.grpExplosions.add(centExp);
+			
 			for (i in 0 ... checks.length) {
 				for (l in 1 ... _blastSize+1) {
 					var offset:Array<Int> = checks[i];
@@ -67,6 +71,10 @@ class Bomb extends FlxSprite {
 							PlayState.powerUpTiles[index] = null;
 						}
 						
+					}
+					if (type == 3 || type == 1) {
+						var exp:Explosion = new Explosion(xt, yt);
+						PlayState.grpExplosions.add(exp);
 					}
 					if (type == 3) { //Breakable, break
 						PlayState.tileMap.setTile(xt, yt, 1, true);
