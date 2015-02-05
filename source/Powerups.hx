@@ -16,6 +16,7 @@ class Powerups extends FlxSprite {
 	/**1: Fire - Increase the bomb blast radius
 	 * 2: Bomb-Up - Increase the number of bombs that can be set at one time.
 	 * 3: Pierce - Bomb blast will pass through as many soft blocks as the fire level will allow.
+	 * 4: Speed - Increase the speed of the player.
 	*/
 	public function new(xTile:Int, yTile:Int, type:Int) {
 		super(xTile * PlayState.tileSize, yTile * PlayState.tileSize);
@@ -29,6 +30,8 @@ class Powerups extends FlxSprite {
 			bombUp();
 		} else if (type == 3) {
 			pierce();
+		} else if (type == 4) {
+			speed();
 		}
 	}
 	
@@ -42,6 +45,10 @@ class Powerups extends FlxSprite {
 	
 	private function pierce():Void {
 		loadGraphic(AssetPaths.pPierce__png, true, 16, 16);
+	}
+	
+	private function speed():Void {
+		loadGraphic(AssetPaths.pSpeed__png, true, 16, 16);
 	}
 	
 	override public function update():Void {

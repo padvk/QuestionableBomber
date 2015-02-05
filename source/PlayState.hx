@@ -162,12 +162,14 @@ class PlayState extends FlxState {
 		for (i in 0...count) {
 			var index:Int = breakableIndices[Std.random(breakableIndices.length)];
 			var type:Int = 0;
-			if (i <= Math.floor(count * .4)) {
+			if (i <= Math.floor(count * .3)) {
 				type = 1;
-			} else if (i <= Math.floor(count * 0.8) && i > Math.floor(count * .4)) {
+			} else if (i <= Math.round(count * 0.6) && i > Math.round(count * .3)) {
 				type = 2;
-			} else if (i > Math.floor(count * .8)) {
+			} else if (i <= Math.round(count * 0.9) && i > Math.round(count * .6)) {
 				type = 3;
+			} else if (i > Math.round(count * 0.9)) {
+				type = 4;
 			}
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
 			pUp.visible = false;
@@ -196,8 +198,13 @@ class PlayState extends FlxState {
 							}
 						case 3:
 							p.blastPiercing = true;
+						case 4:
+							if (p.speedPups < 3) {
+								p.moveTime -= .02;
+							p.speedPups += 1;
+							}
 					}
-					theHud.updateHUD(p.bombs, p.blastSize, p.blastPiercing);
+					theHud.updateHUD(p.bombs, p.blastSize, p.blastPiercing, p.speedPups);
 					
 					powerUpTiles[j] = null;
 					_grpPowerups.remove(pUp);
@@ -222,18 +229,19 @@ class PlayState extends FlxState {
 			var checkTileY:Int = 0;
 			var checkTile:Int;
 			var checkTileIndex:Int;
+			var p:Player = players[_playerID];
 			if (up) {
-				checkTileX = Math.round(players[_playerID].x / tileSize);
-				checkTileY = Math.round((players[_playerID].y - tileSize) / tileSize);
+				checkTileX = Math.round(p.x / tileSize);
+				checkTileY = Math.round((p.y - tileSize) / tileSize);
 			} else if (down) {
-				checkTileX = Math.round(players[_playerID].x / tileSize);
-				checkTileY = Math.round((players[_playerID].y + tileSize) / tileSize);
+				checkTileX = Math.round(p.x / tileSize);
+				checkTileY = Math.round((p.y + tileSize) / tileSize);
 			} else if (left) {
-				checkTileX = Math.round((players[_playerID].x - tileSize) / tileSize);
-				checkTileY = Math.round(players[_playerID].y / tileSize);
+				checkTileX = Math.round((p.x - tileSize) / tileSize);
+				checkTileY = Math.round(p.y / tileSize);
 			} else if (right) {
-				checkTileX = Math.round((players[_playerID].x + tileSize) / tileSize);
-				checkTileY = Math.round(players[_playerID].y / tileSize);
+				checkTileX = Math.round((p.x + tileSize) / tileSize);
+				checkTileY = Math.round(p.y / tileSize);
 			}
 			
 			checkTile = tileMap.getTile(checkTileX, checkTileY);
@@ -241,20 +249,20 @@ class PlayState extends FlxState {
 			if (checkTile == 1 && bombTiles[checkTileIndex] == null) {
 				_playerMoving = true;
 				if (up) {
-					FlxTween.tween(players[_playerID], { y:players[_playerID].y - tileSize, yTile:players[_playerID].yTile - 1 }, _moveTime, { complete:endMovement });
-					players[_playerID].facing = FlxObject.UP;
+					FlxTween.tween(p, { y:p.y - tileSize, yTile:p.yTile - 1 }, p.moveTime , { complete:endMovement } );
+					p.facing = FlxObject.UP;
 				} else if (down) {
-					FlxTween.tween(players[_playerID], { y:players[_playerID].y + tileSize, yTile:players[_playerID].yTile + 1 }, _moveTime, { complete:endMovement });
-					players[_playerID].facing = FlxObject.DOWN;
+					FlxTween.tween(p, { y:p.y + tileSize, yTile:p.yTile + 1 }, p.moveTime, { complete:endMovement });
+					p.facing = FlxObject.DOWN;
 				} else if (left) {
-					FlxTween.tween(players[_playerID], { x:players[_playerID].x - tileSize, xTile:players[_playerID].xTile - 1 }, _moveTime, { complete:endMovement });
-					players[_playerID].facing = FlxObject.LEFT;
+					FlxTween.tween(p, { x:p.x - tileSize, xTile:p.xTile - 1 }, p.moveTime, { complete:endMovement });
+					p.facing = FlxObject.LEFT;
 				} else if (right) {
-					FlxTween.tween(players[_playerID], { x:players[_playerID].x + tileSize, xTile:players[_playerID].xTile + 1 }, _moveTime, { complete:endMovement });
-					players[_playerID].facing = FlxObject.RIGHT;
+					FlxTween.tween(p, { x:p.x + tileSize, xTile:p.xTile + 1 }, p.moveTime, { complete:endMovement });
+					p.facing = FlxObject.RIGHT;
 				}
 				
-				players[_playerID].animate();
+				p.animate();
 			}
 		}
 	}

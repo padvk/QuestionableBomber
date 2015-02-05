@@ -11,11 +11,12 @@ import flixel.FlxSprite;
 class Player extends FlxSprite {
 	public var xTile:Int;
 	public var yTile:Int;
-	
 	public var bombs:Int = 1;
 	public var maxBombs:Int = 1; //Start at 1, then increase until 5
 	public var blastSize:Int = 1;
 	public var blastPiercing:Bool = false;
+	public var moveTime:Float = .15;
+	public var speedPups:Int = 0;
 
 	public function new(X:Float=0, Y:Float=0) {
 		super(X, Y);
