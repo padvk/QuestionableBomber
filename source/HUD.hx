@@ -22,7 +22,7 @@ class HUD extends FlxTypedGroup<FlxSprite> {
 
     public function new() {
         super();
-        _txtBombs = new FlxText(18, 2, 0, "1 / 5", 8);
+        _txtBombs = new FlxText(18, 2, 0, "1 / 1", 8);
         _txtBombs.setBorderStyle(FlxText.BORDER_SHADOW, FlxColor.GRAY, 1, 1);
 		_sprBomb = new FlxSprite(4, _txtBombs.y + (_txtBombs.height / 2)  - 6, AssetPaths.bomb__png);
 		_sprBackBomb = new FlxSprite().makeGraphic(50, 20, FlxColor.GREEN);
@@ -61,15 +61,27 @@ class HUD extends FlxTypedGroup<FlxSprite> {
         });
     }
 
-    public function updateHUD(Bombs:Int, Blast:Int, Pierce:Bool = false, Speed:Int = -1):Void {
-        _txtBombs.text = Std.string(Bombs) + " / 5";
-        _txtBlast.text = Std.string(Blast) + " / 5";
-        _txtBlast.x = _sprBlast.x - _txtBlast.width - 4;
+    public function updateHUD(Bombs:Int, Blast:Int, Pierce:Bool = false, Speed:Int = -1, MaxBombs:Int = -1):Void {
+		if (MaxBombs != -1) {
+			_txtBombs.text = Std.string(Bombs) + " / " + MaxBombs;
+			if (MaxBombs == 5) {
+				_txtBombs.color = FlxColor.YELLOW;
+			}
+		}
+		_txtBlast.text = Std.string(Blast) + " / 5";
+		_txtBlast.x = _sprBlast.x - _txtBlast.width - 4;
+		if (Blast == 5) {
+			_txtBlast.color = FlxColor.YELLOW;
+		}
 		if (Speed != -1) {
 			_txtSpeed.text = Std.string(Speed) + " / 3";
+			if (Speed == 3) {
+				_txtSpeed.color = FlxColor.YELLOW;
+			}
 		}
 		if (Pierce == true) {
 			_txtPierce.text = "Bomb piercing: On";
+			_txtPierce.color = FlxColor.YELLOW;
 		}
     }
 }

@@ -107,7 +107,7 @@ class PlayState extends FlxState {
 			bombTiles[(yTile * tileMap.widthInTiles) + xTile] = bmb; //Add to bomb tile array
 			p.bombs -= 1; //Decrease player bombs
 			
-			theHud.updateHUD(p.bombs, p.blastSize);
+			theHud.updateHUD(p.bombs, p.blastSize, false, -1, p.maxBombs);
 		}
 	}
 	
@@ -161,14 +161,14 @@ class PlayState extends FlxState {
 		
 		for (i in 0...count) {
 			var index:Int = breakableIndices[Std.random(breakableIndices.length)];
-			var type:Int = 0;
+			var type:Int = 1;
 			if (i <= Math.floor(count * .3)) {
 				type = 1;
 			} else if (i <= Math.round(count * 0.6) && i > Math.round(count * .3)) {
 				type = 2;
-			} else if (i <= Math.round(count * 0.9) && i > Math.round(count * .6)) {
+			} else if (i <= Math.round(count * 0.7) && i > Math.round(count * .6)) {
 				type = 3;
-			} else if (i > Math.round(count * 0.9)) {
+			} else if (i > Math.round(count * 0.7)) {
 				type = 4;
 			}
 			var pUp = new Powerups((index % tileMap.widthInTiles), (Math.floor(index / tileMap.widthInTiles)), type);
@@ -204,7 +204,7 @@ class PlayState extends FlxState {
 							p.speedPups += 1;
 							}
 					}
-					theHud.updateHUD(p.bombs, p.blastSize, p.blastPiercing, p.speedPups);
+					theHud.updateHUD(p.bombs, p.blastSize, p.blastPiercing, p.speedPups, p.maxBombs);
 					
 					powerUpTiles[j] = null;
 					_grpPowerups.remove(pUp);
@@ -233,35 +233,26 @@ class PlayState extends FlxState {
 			if (up) {
 				checkTileX = Math.round(p.x / tileSize);
 				checkTileY = Math.round((p.y - tileSize) / tileSize);
+				p.facing = FlxObject.UP;
 			} else if (down) {
 				checkTileX = Math.round(p.x / tileSize);
 				checkTileY = Math.round((p.y + tileSize) / tileSize);
+				p.facing = FlxObject.DOWN;
 			} else if (left) {
 				checkTileX = Math.round((p.x - tileSize) / tileSize);
 				checkTileY = Math.round(p.y / tileSize);
+				p.facing = FlxObject.LEFT;
 			} else if (right) {
 				checkTileX = Math.round((p.x + tileSize) / tileSize);
 				checkTileY = Math.round(p.y / tileSize);
+				p.facing = FlxObject.RIGHT;
 			}
 			
 			checkTile = tileMap.getTile(checkTileX, checkTileY);
 			checkTileIndex = (checkTileY * tileMap.widthInTiles) + checkTileX;
 			if (checkTile == 1 && bombTiles[checkTileIndex] == null) {
 				_playerMoving = true;
-				if (up) {
-					FlxTween.tween(p, { y:p.y - tileSize, yTile:p.yTile - 1 }, p.moveTime , { complete:endMovement } );
-					p.facing = FlxObject.UP;
-				} else if (down) {
-					FlxTween.tween(p, { y:p.y + tileSize, yTile:p.yTile + 1 }, p.moveTime, { complete:endMovement });
-					p.facing = FlxObject.DOWN;
-				} else if (left) {
-					FlxTween.tween(p, { x:p.x - tileSize, xTile:p.xTile - 1 }, p.moveTime, { complete:endMovement });
-					p.facing = FlxObject.LEFT;
-				} else if (right) {
-					FlxTween.tween(p, { x:p.x + tileSize, xTile:p.xTile + 1 }, p.moveTime, { complete:endMovement });
-					p.facing = FlxObject.RIGHT;
-				}
-				
+				FlxTween.tween(p, { y:checkTileY * tileSize, yTile:checkTileY, x:checkTileX * tileSize, xTile:checkTileX }, p.moveTime , { complete:endMovement } );
 				p.animate();
 			}
 		}
